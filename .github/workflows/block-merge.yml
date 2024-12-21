@@ -1,0 +1,21 @@
+name: Block Merges Between main and Assignment Branches
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  prevent-merge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for merge to/from protected branches
+        run: |
+          if [[ "${{ github.base_ref }}" == "main" && "${{ github.head_ref }}" =~ ^202[0-9]+-S[0-9]+-A[0-9]+$ ]]; then
+            echo "Merging from assignment branch to main is not allowed."
+            exit 1
+          fi
+
+          if [[ "${{ github.head_ref }}" == "main" && "${{ github.base_ref }}" =~ ^202[0-9]+-S[0-9]+-A[0-9]+$ ]]; then
+            echo "Merging from main to assignment branch is not allowed."
+            exit 1
+          fi

@@ -18,8 +18,8 @@
 
 int main(int argc, char **argv)
 {
-	uint8_t running = 1, win_or_lose = 0;			  /* Control game loop and result */
-	uint16_t map_size[2], player_pos[2], goal_pos[2]; /* Map dimensions and player/goal positions */
+	unsigned char running = 1, win_or_lose = 0;			  /* Control game loop and result */
+	unsigned short map_size[2], player_pos[2], goal_pos[2]; /* Map dimensions and player/goal positions */
 	char **grid = NULL;								  /* Grid representation */
 
 	/* Parse and validate arguments, initialize map and player positions */
