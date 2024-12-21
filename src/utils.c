@@ -12,10 +12,10 @@
 #include "utils.h"
 
 /* Parses command-line arguments to initialize map size, player position, and goal position */
-uint8_t argParser(int argc, char **argv, uint16_t map_size[2], uint16_t player_pos[2], uint16_t goal_pos[2])
+unsigned char argParser(int argc, char **argv, unsigned short map_size[2], unsigned short player_pos[2], unsigned short goal_pos[2])
 {
-	uint8_t return_val = 1;
-	int32_t tmp_val; /* Temporary variable for parsing */
+	unsigned char return_val = 1;
+	int tmp_val; /* Temporary variable for parsing */
 	char *endptr;	 /* Pointer to track any invalid characters during conversion */
 
 	/* Check if the correct number of arguments are provided */
@@ -38,7 +38,7 @@ uint8_t argParser(int argc, char **argv, uint16_t map_size[2], uint16_t player_p
 			printf("Error: Map rows cannot be less than 5!\n");
 			return_val = 0;
 		}
-		map_size[0] = (uint16_t)tmp_val;
+		map_size[0] = (unsigned short)tmp_val;
 
 		/* Parse map columns */
 		tmp_val = strtol(argv[2], &endptr, 10);
@@ -52,7 +52,7 @@ uint8_t argParser(int argc, char **argv, uint16_t map_size[2], uint16_t player_p
 			printf("Error: Map columns cannot be less than 5!\n");
 			return_val = 0;
 		}
-		map_size[1] = (uint16_t)tmp_val;
+		map_size[1] = (unsigned short)tmp_val;
 
 		/* Parse player row */
 		tmp_val = strtol(argv[3], &endptr, 10);
@@ -66,7 +66,7 @@ uint8_t argParser(int argc, char **argv, uint16_t map_size[2], uint16_t player_p
 			printf("Error: Player row cannot be negative!\n");
 			return_val = 0;
 		}
-		player_pos[0] = (uint16_t)tmp_val;
+		player_pos[0] = (unsigned short)tmp_val;
 
 		/* Parse player column */
 		tmp_val = strtol(argv[4], &endptr, 10);
@@ -80,7 +80,7 @@ uint8_t argParser(int argc, char **argv, uint16_t map_size[2], uint16_t player_p
 			printf("Error: Player column cannot be negative!\n");
 			return_val = 0;
 		}
-		player_pos[1] = (uint16_t)tmp_val;
+		player_pos[1] = (unsigned short)tmp_val;
 
 		/* Parse goal row */
 		tmp_val = strtol(argv[5], &endptr, 10);
@@ -94,7 +94,7 @@ uint8_t argParser(int argc, char **argv, uint16_t map_size[2], uint16_t player_p
 			printf("Error: Goal row cannot be negative!\n");
 			return_val = 0;
 		}
-		goal_pos[0] = (uint16_t)tmp_val;
+		goal_pos[0] = (unsigned short)tmp_val;
 
 		/* Parse goal column */
 		tmp_val = strtol(argv[6], &endptr, 10);
@@ -108,7 +108,7 @@ uint8_t argParser(int argc, char **argv, uint16_t map_size[2], uint16_t player_p
 			printf("Error: Goal column cannot be negative!\n");
 			return_val = 0;
 		}
-		goal_pos[1] = (uint16_t)tmp_val;
+		goal_pos[1] = (unsigned short)tmp_val;
 
 		/* Check if the parsed values are within valid range */
 		if (return_val)
@@ -128,7 +128,7 @@ uint8_t argParser(int argc, char **argv, uint16_t map_size[2], uint16_t player_p
 			}
 
 			/* Ensure player and goal positions are not the same */
-			if (return_val && (memcmp(player_pos, goal_pos, sizeof(uint16_t) * 2) == 0))
+			if (return_val && (memcmp(player_pos, goal_pos, sizeof(unsigned short) * 2) == 0))
 			{
 				printf("Error: Player and Goal positions can't be the same!\n");
 				return_val = 0;

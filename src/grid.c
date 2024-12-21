@@ -13,9 +13,9 @@
 #include "grid.h"
 
 /* Initializes a 2D grid with specified dimensions and places player and goal at given positions */
-char **initGrid(uint16_t map_size[2], uint16_t player_pos[2], uint16_t goal_pos[2])
+char **initGrid(unsigned short map_size[2], unsigned short player_pos[2], unsigned short goal_pos[2])
 {
-	uint16_t row;
+	unsigned short row;
 	char **grid = (char **)malloc(sizeof(char *) * map_size[0]); /* Allocate rows for grid */
 
 	if (grid != NULL)
@@ -60,9 +60,9 @@ char **initGrid(uint16_t map_size[2], uint16_t player_pos[2], uint16_t goal_pos[
 }
 
 /* Prints the current grid state with borders */
-void printGrid(char **grid, uint16_t map_size[2])
+void printGrid(char **grid, unsigned short map_size[2])
 {
-	uint16_t i;
+	unsigned short i;
 	char *h_border = malloc(sizeof(char) * (map_size[1] + 2));
 	memset(h_border, '*', map_size[1] + 2);
 
@@ -79,10 +79,10 @@ void printGrid(char **grid, uint16_t map_size[2])
 }
 
 /* Creates a floor break ('X') at a random unoccupied position on the grid */
-void breakFloor(char **grid, uint16_t map_size[2])
+void breakFloor(char **grid, unsigned short map_size[2])
 {
-	uint16_t x_pos[2];
-	uint8_t unique = 0;
+	unsigned short x_pos[2];
+	unsigned char unique = 0;
 
 	/* Find a random empty spot and place an 'X' */
 	while (!unique)
@@ -99,7 +99,7 @@ void breakFloor(char **grid, uint16_t map_size[2])
 }
 
 /* Adjusts the position to wrap around borders if BORDERLESS is defined */
-void _borderless(int32_t pos[2], uint16_t map_size[2])
+void _borderless(int pos[2], unsigned short map_size[2])
 {
 	if (pos[0] < 0)
 	{
@@ -121,12 +121,12 @@ void _borderless(int32_t pos[2], uint16_t map_size[2])
 }
 
 /* Moves the player based on user input and checks border conditions */
-void movePlayer(char user_input, char **grid, uint16_t map_size[2], uint16_t player_pos[2])
+void movePlayer(char user_input, char **grid, unsigned short map_size[2], unsigned short player_pos[2])
 {
-	int32_t future_pos[2];
+	int future_pos[2];
 
-	future_pos[0] = (int32_t)player_pos[0];
-	future_pos[1] = (int32_t)player_pos[1];
+	future_pos[0] = (int)player_pos[0];
+	future_pos[1] = (int)player_pos[1];
 
 	/* Update future position based on input */
 	switch (user_input)
@@ -156,11 +156,11 @@ void movePlayer(char user_input, char **grid, uint16_t map_size[2], uint16_t pla
 #endif
 
 	/* Move player to future position if accessible */
-	if (!(future_pos[0] == (int32_t)player_pos[0] && future_pos[1] == (int32_t)player_pos[1]) && future_pos[0] >= 0 && future_pos[0] < map_size[0] && future_pos[1] >= 0 && future_pos[1] < map_size[1] && grid[future_pos[0]][future_pos[1]] != 'X')
+	if (!(future_pos[0] == (int)player_pos[0] && future_pos[1] == (int)player_pos[1]) && future_pos[0] >= 0 && future_pos[0] < map_size[0] && future_pos[1] >= 0 && future_pos[1] < map_size[1] && grid[future_pos[0]][future_pos[1]] != 'X')
 	{
 		grid[player_pos[0]][player_pos[1]] = ' ';
-		player_pos[0] = (uint16_t)future_pos[0];
-		player_pos[1] = (uint16_t)future_pos[1];
+		player_pos[0] = (unsigned short)future_pos[0];
+		player_pos[1] = (unsigned short)future_pos[1];
 		grid[player_pos[0]][player_pos[1]] = 'P';
 
 		breakFloor(grid, map_size);
@@ -168,9 +168,9 @@ void movePlayer(char user_input, char **grid, uint16_t map_size[2], uint16_t pla
 }
 
 /* Frees the allocated grid memory */
-void freeGrid(char **grid, uint16_t map_size[2])
+void freeGrid(char **grid, unsigned short map_size[2])
 {
-	uint16_t i;
+	unsigned short i;
 
 	if (grid != NULL)
 	{
@@ -185,16 +185,16 @@ void freeGrid(char **grid, uint16_t map_size[2])
 }
 
 /* Validates the position on grid as accessible and unvisited */
-uint8_t _isValid(int32_t pos[2], uint8_t **visited, char **grid, uint16_t map_size[2])
+unsigned char _isValid(int pos[2], unsigned char **visited, char **grid, unsigned short map_size[2])
 {
 	return pos[0] >= 0 && pos[0] < map_size[0] && pos[1] >= 0 && pos[1] < map_size[1] && grid[pos[0]][pos[1]] != 'X' && !visited[pos[0]][pos[1]];
 }
 
 /* Recursive DFS algorithm to find path to goal */
-uint8_t _dfs(int32_t pos[2], uint8_t **visited, char **grid, uint16_t map_size[2])
+unsigned char _dfs(int pos[2], unsigned char **visited, char **grid, unsigned short map_size[2])
 {
-	uint8_t found_path = 0;
-	int32_t newPos[2];
+	unsigned char found_path = 0;
+	int newPos[2];
 
 #ifdef BORDERLESS
 	_borderless(pos, map_size);
@@ -248,26 +248,26 @@ uint8_t _dfs(int32_t pos[2], uint8_t **visited, char **grid, uint16_t map_size[2
 }
 
 /* Determines win/lose status by checking if player can reach goal */
-uint8_t winOrLose(char **grid, uint16_t map_size[2], uint16_t player_pos[2], uint16_t goal_pos[2])
+unsigned char winOrLose(char **grid, unsigned short map_size[2], unsigned short player_pos[2], unsigned short goal_pos[2])
 {
-	uint8_t return_val = 0, **visited = NULL;
-	uint16_t i;
-	int32_t int_pos[2];
+	unsigned char return_val = 0, **visited = NULL;
+	unsigned short i;
+	int int_pos[2];
 
-	int_pos[0] = (int32_t)player_pos[0];
-	int_pos[1] = (int32_t)player_pos[1];
+	int_pos[0] = (int)player_pos[0];
+	int_pos[1] = (int)player_pos[1];
 
-	visited = (uint8_t **)malloc(sizeof(uint8_t *) * map_size[0]);
+	visited = (unsigned char **)malloc(sizeof(unsigned char *) * map_size[0]);
 
 	for (i = 0; i < map_size[0]; i++)
 	{
 
-		visited[i] = (uint8_t *)malloc(map_size[1]);
+		visited[i] = (unsigned char *)malloc(map_size[1]);
 		memset(visited[i], 0, map_size[1]);
 	}
 
 	/* Check if player is at goal position */
-	if (memcmp(player_pos, goal_pos, sizeof(uint16_t) * 2) == 0)
+	if (memcmp(player_pos, goal_pos, sizeof(unsigned short) * 2) == 0)
 	{
 		return_val = 1;
 	}
