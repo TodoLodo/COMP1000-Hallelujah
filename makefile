@@ -14,8 +14,8 @@ SRCDIR = src
 INCDIR = include
 LIBDIR = lib
 BINDIR = bin
-OBJDIR = obj
-TESTDIR = test
+OBJDIR = build
+TESTDIR = tests
 
 # File extensions and patterns
 SRC = $(wildcard $(SRCDIR)/*.c)
@@ -55,7 +55,7 @@ $(BINDIR) $(OBJDIR):
 	mkdir -p $@
 
 # Test targets (general rule)
-test: $(TEST_SRC:$(TESTDIR)/%.c=$(BINDIR)/test_%)
+tests: $(TEST_SRC:$(TESTDIR)/%.c=$(BINDIR)/test_%)
 
 $(BINDIR)/test_%: $(OBJDIR)/test_%.o $(LIB_OBJ) $(OBJDIR)/%.o
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
