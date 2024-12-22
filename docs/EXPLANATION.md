@@ -220,32 +220,12 @@ This setup allows the program to dynamically read and process input from the use
 
 ### 3. Declaring Key Variables  
 Inside the `main` function, the following variables are declared:  
-```c  
-unsigned char running = 1, win_or_lose = 0;              /* Control game loop and result */  
+```c   
 unsigned short map_size[2], player_pos[2], goal_pos[2];  /* Map dimensions and player/goal positions */  
 char **grid = NULL;                                     /* Grid representation */  
 ```  
 
 #### Variable Explanation  
-
-##### `running` and `win_or_lose`  
-- **Purpose**:  
-  - `running`: Tracks whether the game loop should continue running.  
-    - `1` (true): Keeps the main loop active.  
-    - `0` (false): Stops the loop when a win or lose condition is met.  
-  - `win_or_lose`: Stores the result of the game.  
-    - `0`: Neither won nor lost (game in progress).  
-    - `1`: Player has won.  
-    - `2`: Player has lost.  
-
-- **Data Type Selection**:  
-  - `unsigned char` is used as it can efficiently store small, non-negative values within its 8-bit range.  
-  - This avoids unnecessary memory usage compared to a larger data type like `int`.  
-
-- **Usage**:  
-  - `running`: Allows the program to avoid multiple `return` or `exit()` calls.  
-  - `win_or_lose`: Conditionally determines whether to print a win or lose message at the end of the game.  
-
 
 ##### `map_size`, `player_pos`, and `goal_pos`
 - **Purpose**:  
@@ -279,7 +259,7 @@ char **grid = NULL;                                     /* Grid representation *
 - **Usage**:  
   - The `grid` will be initialized to represent the map's state and updated during the game loop to reflect player movements and collapsing floors.  
 
-#### **Design Rationale**  
+#### Design Rationale
 - Using these carefully chosen data types and variable names ensures the program is both memory-efficient and easy to understand.  
 - Grouping related data into arrays (`map_size`, `player_pos`, `goal_pos`) simplifies parameter passing and updates across functions.  
 - Avoiding hardcoding the grid size allows flexibility for different map dimensions provided via command-line arguments.  
@@ -1101,3 +1081,250 @@ unsigned char winOrLose(char **grid, unsigned short map_size[2], unsigned short 
    - Ensures that each position visited during DFS is valid (within bounds, not blocked, and unvisited).
 
 Together, these functions enable the program to decide whether the player has won, lost, or can continue the game.
+
+### 7. Towards the main game loop
+
+The main gameplay logic revolves around initializing the game environment, entering the main gameplay loop, and properly cleaning up resources after the game ends. Here's a detailed breakdown:
+
+---
+
+#### Initialization
+
+```c
+/* Initialize grid and random number generator */
+grid = initGrid(map_size, player_pos, goal_pos);
+initRandom();
+```
+
+- **`initGrid`:** 
+  - This function initializes the game grid and sets up the player (`P`) and goal (`G`) positions based on the given parameters (`map_size`, `player_pos`, `goal_pos`).
+  - If memory allocation fails at any point during the grid creation, `initGrid` will return `NULL`, and an error message will already have been printed by the function.
+
+- **`initRandom`:** 
+  - This function initializes the random number generator, which is used for functions like `breakFloor` to determine random positions for obstacles. It is part of the library provided in the assessment.
+
+- The conditional check (`if (grid != NULL)`) ensures that the rest of the game logic proceeds only if the grid is successfully initialized.
+
+---
+
+#### Pre-Loop Grid Display
+
+```c
+/* Display the current grid */
+printGrid(grid, map_size);
+```
+
+- Before entering the main gameplay loop, the grid is displayed to the user using the `printGrid` function.
+- This initial print ensures that the player sees the starting state of the grid before any input is processed. It avoids redundancy by simplifying the logic within the loop, as the grid is printed only after an action is taken.
+
+---
+
+#### Main Gameplay Loop
+
+```c
+while (!winOrLose(grid, map_size, player_pos, goal_pos))
+{
+    /* Move player and check game status */
+    movePlayer(getUserInput(), grid, map_size, player_pos);
+
+    /* Display the current grid */
+    printGrid(grid, map_size);
+}
+```
+
+- **While Loop Condition:**
+  - The loop continues as long as `winOrLose` returns `0`, indicating the game is still ongoing.
+  - `winOrLose` determines the game's end state (win or lose) by checking if the player can reach the goal. If the function returns `1`, the loop stops.
+
+- **Inside the Loop:**
+  1. **Player Movement:**
+     - `movePlayer` handles the player's movement based on input retrieved from the `getUserInput` function.
+     - The `getUserInput` function is defined in `utils.c` (to be explained later) and captures user input without requiring the user to press "Enter".
+     - `movePlayer` ensures the movement is valid and updates the grid accordingly.
+
+  2. **Updated Grid Display:**
+     - After each movement, the updated grid is displayed to reflect the player's new position and any changes (e.g., broken floors marked as `X`).
+
+---
+
+#### Memory Cleanup
+
+```c
+/* Free grid memory after gameplay */
+freeGrid(grid, map_size);
+```
+
+- After the game ends (either a win or loss), `freeGrid` is called to deallocate all the memory allocated for the grid.
+- This includes freeing each row and then freeing the grid itself. Setting `grid` to `NULL` ensures there are no dangling pointers.
+
+---
+
+#### Why is the Code Organized This Way?
+
+1. **Grid Initialization:**
+   - Placing grid initialization and random number setup at the start ensures the game is ready before any actions are taken.
+   - The check for `grid != NULL` prevents the program from proceeding in case of allocation failures.
+
+2. **Pre-Loop Grid Display:**
+   - Displaying the grid before the loop avoids redundant logic within the loop and provides a clear initial state to the player.
+
+3. **Minimalism in the Loop:**
+   - By organizing the loop to handle only movement and grid display, the code remains clean and concise.
+   - All win/lose checks are encapsulated in `winOrLose`, simplifying the condition handling.
+
+4. **Memory Management:**
+   - Explicitly freeing the grid after the game ensures no memory leaks, maintaining good programming practices.
+
+---
+
+### 8. getUserInput
+
+The `getUserInput` function is responsible for capturing the player's movement input in real-time without requiring the user to press "Enter" after entering their choice. Here's a step-by-step breakdown:
+
+---
+
+#### Function Definition
+```c
+char getUserInput()
+{
+	char input;
+
+	/* Prompt the user for movement input */
+	printf("Press w to go up\nPress s to go down\nPress a to go left\nPress d to go right\n");
+
+	/* Temporarily disable input buffering to read single character input */
+	disableBuffer();
+	scanf(" %c", &input);
+	enableBuffer();
+
+	return input;
+}
+```
+
+---
+
+#### Step-by-Step Breakdown
+
+1. **Prompting the Controls**
+   ```c
+   printf("Press w to go up\nPress s to go down\nPress a to go left\nPress d to go right\n");
+   ```
+   - The function prints out the movement controls, allowing the player to understand which keys (`w`, `a`, `s`, `d`) correspond to each direction (up, left, down, right).
+   - This message is displayed after the grid is printed, providing the user with clear and immediate feedback.
+
+2. **Temporary Disabling of Input Buffering**
+   ```c
+   disableBuffer();
+   ```
+   - The `disableBuffer` function (provided by the `terminal.h` library in the assessment) disables input buffering in the terminal.
+   - Normally, terminals buffer the user's input until "Enter" is pressed. Disabling buffering allows the program to immediately capture a single character without requiring the user to press "Enter."
+
+3. **Capturing Input**
+   ```c
+   scanf(" %c", &input);
+   ```
+   - `scanf` is used to read a single character input from the user, storing it in the `input` variable.
+   - The `" %c"` format ensures that leading whitespace characters (if any) are ignored.
+
+4. **Re-enabling Input Buffering**
+   ```c
+   enableBuffer();
+   ```
+   - After capturing the input, `enableBuffer` re-enables the terminal's input buffering.
+   - This ensures normal terminal behavior is restored for subsequent operations.
+
+5. **Returning the Input**
+   ```c
+   return input;
+   ```
+   - The function returns the captured character (`input`) to the calling function, which in this case is the `movePlayer` function in the main gameplay loop.
+
+---
+
+#### Purpose of the Function
+
+- **Real-Time Input Capture:**
+  - The function's primary goal is to capture user input in real-time, making the gameplay more dynamic and interactive.
+  - Players can provide directional input (`w`, `a`, `s`, `d`) without pressing "Enter," creating a smoother user experience.
+
+- **Buffer Management:**
+  - By temporarily disabling and re-enabling the terminal buffer, the function ensures input handling is efficient and does not interfere with the terminal's normal behavior outside the game.
+
+---
+
+### 9. RETURN 0
+
+In C, the `return 0;` statement in a function, typically in the `main` function, serves a specific purpose related to the program's execution status. Let me break it down:
+
+![Let me break it down](https://media1.tenor.com/m/nep7WtDOM70AAAAC/benson-regular-show.gif)
+
+---
+
+#### Role of the `main` Function
+The `main` function in C is the entry point of a program. When the program is executed, the operating system starts its execution by calling the `main` function.
+
+- The `main` function is expected to return an integer, as defined by its signature:
+  ```c
+  int main() { ... }
+  ```
+- This return value communicates the program's status back to the operating system.
+
+---
+
+#### Meaning of `return 0;`
+The value returned by the `main` function serves as an **exit status** for the program:
+
+- **`0`**:
+  - Conventionally indicates **successful execution** of the program.
+  - It tells the operating system that the program ran as expected without errors.
+  ```c
+  return 0;
+  ```
+- **Non-Zero Values**:
+  - Usually indicate an **error or abnormal termination**.
+  - Programmers use specific non-zero values to signal different types of errors. For example:
+    ```c
+    return 1; // General error
+    return 2; // Specific error
+    ```
+
+---
+
+#### Why Is `return 0;` Important?
+- **Communication with the Operating System:**
+  - The exit status (`0` or non-zero) allows the operating system or calling processes (like scripts) to determine whether the program executed successfully.
+  - Example in a Unix shell:
+    ```bash
+    ./my_program
+    if [ $? -eq 0 ]; then
+        echo "Program ran successfully"
+    else
+        echo "Program encountered an error"
+    fi
+    ```
+  - `$?` contains the exit status of the last command.
+
+- **Standard Practice:**
+  - It is a good habit to explicitly return `0` in `main` to indicate that the program completed without issues.
+
+---
+
+#### What If You Don’t Use `return` in `main`?
+- In modern C standards (`C99` and later), if you omit the `return` statement, the compiler implicitly adds `return 0;` at the end of the `main` function.
+  ```c
+  int main() {
+      printf("Hello, World!\n");
+      // No return statement
+  }
+  ```
+  This is equivalent to:
+  ```c
+  int main() {
+      printf("Hello, World!\n");
+      return 0; // Implicitly added by the compiler
+  }
+  ```
+
+- However, it is still recommended to explicitly write `return 0;` for clarity and maintainability, especially in older C standards (`C89`/`C90`) where omitting it might result in undefined behavior.
+
+---
