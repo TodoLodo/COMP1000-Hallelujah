@@ -83,8 +83,6 @@ The main goal of this program is to create an interactive terminal-based game ca
 5. Implement winning and losing conditions, ending the game based on player actions and map state.
 6. Add a **BORDERLESS** compilation option to allow advanced movement across map edges.
 
----
-
 ### Key Challenges and Solutions
 
 #### 1. Command-Line Argument Parsing
@@ -218,10 +216,6 @@ int main(int argc, char **argv)
 
 This setup allows the program to dynamically read and process input from the user during execution.  
 
----  
-
-Here’s the elaborated **Step-by-Step Logical Flow** for the next part of your program, with added explanations and clarity:  
-
 ---
 
 ### 3. Declaring Key Variables  
@@ -232,11 +226,9 @@ unsigned short map_size[2], player_pos[2], goal_pos[2];  /* Map dimensions and p
 char **grid = NULL;                                     /* Grid representation */  
 ```  
 
----
+#### Variable Explanation  
 
-### Variable Explanation  
-
-#### `running` and `win_or_lose`  
+##### `running` and `win_or_lose`  
 - **Purpose**:  
   - `running`: Tracks whether the game loop should continue running.  
     - `1` (true): Keeps the main loop active.  
@@ -254,9 +246,8 @@ char **grid = NULL;                                     /* Grid representation *
   - `running`: Allows the program to avoid multiple `return` or `exit()` calls.  
   - `win_or_lose`: Conditionally determines whether to print a win or lose message at the end of the game.  
 
----
 
-#### `map_size`, `player_pos`, and `goal_pos`
+##### `map_size`, `player_pos`, and `goal_pos`
 - **Purpose**:  
   - These variables hold pairs of related data:  
     - `map_size`: The number of rows and columns of the game map.  
@@ -271,9 +262,7 @@ char **grid = NULL;                                     /* Grid representation *
 - **Usage**:  
   - These variables will be updated after command-line arguments are validated and parsed.  
 
----
-
-#### `grid`
+##### `grid`
 - **Purpose**:  
   - Represents the 2D map, which visually displays the game elements, including:  
     - Player position (`P`)  
@@ -290,9 +279,7 @@ char **grid = NULL;                                     /* Grid representation *
 - **Usage**:  
   - The `grid` will be initialized to represent the map's state and updated during the game loop to reflect player movements and collapsing floors.  
 
----
-
-### **Design Rationale**  
+#### **Design Rationale**  
 - Using these carefully chosen data types and variable names ensures the program is both memory-efficient and easy to understand.  
 - Grouping related data into arrays (`map_size`, `player_pos`, `goal_pos`) simplifies parameter passing and updates across functions.  
 - Avoiding hardcoding the grid size allows flexibility for different map dimensions provided via command-line arguments.  
@@ -310,11 +297,7 @@ if (argParser(argc, argv, map_size, player_pos, goal_pos)) {
 }
 ```
 
----
-
-### Function Overview
-
-#### `argParser` Declaration
+#### Function Overview
 
 The function is declared in `utils.h` as follows:  
 ```c
@@ -334,9 +317,8 @@ unsigned char argParser(int argc, char **argv, unsigned short map_size[2], unsig
      - `goal_pos`: The fixed row and column of the goal.  
    - Arrays are passed by reference in C, meaning the function can directly update their values.  
 
----
 
-### What the Function Does
+#### What the Function Does
 1. **Parses Command-Line Arguments**  
    - Extracts the values of map dimensions, player position, and goal position from the `argv` array.  
 
@@ -354,21 +336,17 @@ unsigned char argParser(int argc, char **argv, unsigned short map_size[2], unsig
    - Returns `1` (true) if all arguments are valid.  
    - Returns `0` (false) if any validation fails.  
 
----
+#### Key Design Decision
 
-### Key Design Decision
-
-#### **Why Use Arrays for Data Pairs?**  
+**Why Use Arrays for Data Pairs?**  
 - Arrays in C work as memory pointers.  
 - Passing an array does not copy its values but provides the function with access to the array's base memory address.  
 - This allows efficient updates to the original array elements within the function, simplifying code and avoiding the overhead of copying data.  
 
-#### Error Handling
+**Error Handling**
 - Errors are handled gracefully by printing appropriate error messages without exiting the program.  
 
----
-
-### Looking Ahead
+#### Looking Ahead
 To fully understand the functionality of `argParser`, the next step is to analyze its **definition** in `utils.c`.  
 
 ---
@@ -514,7 +492,7 @@ return return_val;
 
 ---
 
-### Key Design Choices
+#### Key Design Choices
 
 1. **`strtol` over `atoi`**:  
    - Provides better error handling by detecting invalid characters in input via `endptr`.  
@@ -1109,7 +1087,7 @@ unsigned char winOrLose(char **grid, unsigned short map_size[2], unsigned short 
 
 ---
 
-#### How They Work Together
+##### How They Work Together
 
 1. **`winOrLose`:**
    - Called from the main game loop to determine if the game has reached an end state.
