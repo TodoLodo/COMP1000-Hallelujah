@@ -68,8 +68,6 @@ This structure:
 - Facilitates easier navigation and understanding for contributors.
 - Aligns with widely accepted standards, making it easier for others to contribute or review your work.
 
-Here's how you can structure the **Approach and Logic** section for these objectives in your `EXPLANATION.md`:
-
 ---
 
 ## Approach and Logic
@@ -138,9 +136,6 @@ This program integrates modular functions for each component, enabling a clear a
 3. **`getUserInput()`**: Handles user movement commands and updates the player's position.
 4. **`breakFloor()`**: Randomly collapses a floor grid after each player movement.
 5. **`winOrLose()`**: Determines the game's end condition based on the player's actions and map state.
-
----
-Here’s an elaborated **Pre-thinking and Design Decisions** section based on the logics and ideas you shared:
 
 ---
 
