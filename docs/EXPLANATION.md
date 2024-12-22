@@ -184,3 +184,942 @@ This program integrates modular functions for each component, enabling a clear a
 - **Implementation**:  
   - Files like `grid.c`, `utils.c`, and `main.c` are named based on their responsibilities, making it intuitive to locate functions and logic.
   - Variable names such as `map_size`, `player_pos`, and `goal_pos` are chosen for clarity and ease of understanding.
+
+Here’s a refined and updated explanation for your **Step-by-Step Logical Flow**, incorporating your description and adding structure:  
+
+---
+
+## Step-by-Step Logical Flow  
+
+### 1. Including Necessary Headers  
+At the beginning of `main.c`, the following headers are included to access essential functions and maintain modularity:  
+```c  
+#include "utils.h"  
+#include "grid.h"  
+#include "random.h"  
+```  
+- **Purpose**:  
+  - `utils.h`: Contains functions for parsing and validating command-line arguments and handling user input.  
+  - `grid.h`: Includes all grid-related functions like rendering, player movement, and grid manipulations.  
+  - `random.h`: Used to handle randomness, such as collapsing floor tiles in the game grid.  
+
+Refer to the respective files in the **`src`** directory and their declarations in the **`include`** directory for the detailed implementation.  
+
+---
+
+### 2. Declaring the Main Function  
+The `main` function is defined with the following parameters:  
+```c  
+int main(int argc, char **argv)  
+```  
+- **Purpose**:  
+  - `argc`: The count of arguments passed via the command line, including the program name.  
+  - `argv`: An array of strings (character pointers) that holds the actual arguments.  
+
+This setup allows the program to dynamically read and process input from the user during execution.  
+
+---  
+
+Here’s the elaborated **Step-by-Step Logical Flow** for the next part of your program, with added explanations and clarity:  
+
+---
+
+### 3. Declaring Key Variables  
+Inside the `main` function, the following variables are declared:  
+```c  
+unsigned char running = 1, win_or_lose = 0;              /* Control game loop and result */  
+unsigned short map_size[2], player_pos[2], goal_pos[2];  /* Map dimensions and player/goal positions */  
+char **grid = NULL;                                     /* Grid representation */  
+```  
+
+---
+
+### Variable Explanation  
+
+#### `running` and `win_or_lose`  
+- **Purpose**:  
+  - `running`: Tracks whether the game loop should continue running.  
+    - `1` (true): Keeps the main loop active.  
+    - `0` (false): Stops the loop when a win or lose condition is met.  
+  - `win_or_lose`: Stores the result of the game.  
+    - `0`: Neither won nor lost (game in progress).  
+    - `1`: Player has won.  
+    - `2`: Player has lost.  
+
+- **Data Type Selection**:  
+  - `unsigned char` is used as it can efficiently store small, non-negative values within its 8-bit range.  
+  - This avoids unnecessary memory usage compared to a larger data type like `int`.  
+
+- **Usage**:  
+  - `running`: Allows the program to avoid multiple `return` or `exit()` calls.  
+  - `win_or_lose`: Conditionally determines whether to print a win or lose message at the end of the game.  
+
+---
+
+#### `map_size`, `player_pos`, and `goal_pos`
+- **Purpose**:  
+  - These variables hold pairs of related data:  
+    - `map_size`: The number of rows and columns of the game map.  
+    - `player_pos`: The player's current row and column coordinates.  
+    - `goal_pos`: The goal's row and column coordinates.  
+
+- **Data Type Selection**:  
+  - `unsigned short` is chosen for efficiency:  
+    - It avoids negative values (since positions and map sizes are inherently non-negative).  
+    - Its 16-bit size is sufficient for the assignment's constraints on map dimensions.  
+
+- **Usage**:  
+  - These variables will be updated after command-line arguments are validated and parsed.  
+
+---
+
+#### `grid`
+- **Purpose**:  
+  - Represents the 2D map, which visually displays the game elements, including:  
+    - Player position (`P`)  
+    - Goal position (`G`)  
+    - Collapsed floors (`X`)  
+    - Empty floors (` `) 
+    - Borders (`*`)  
+  - The `grid` variable is dynamically allocated based on the validated map size.  
+
+- **Data Type Selection**:  
+  - `char **`: Chosen for a 2D array representation.  
+  - Each element is a single character, making it memory-efficient and simple to manage.  
+
+- **Usage**:  
+  - The `grid` will be initialized to represent the map's state and updated during the game loop to reflect player movements and collapsing floors.  
+
+---
+
+### **Design Rationale**  
+- Using these carefully chosen data types and variable names ensures the program is both memory-efficient and easy to understand.  
+- Grouping related data into arrays (`map_size`, `player_pos`, `goal_pos`) simplifies parameter passing and updates across functions.  
+- Avoiding hardcoding the grid size allows flexibility for different map dimensions provided via command-line arguments.  
+
+---
+
+### 4. Parsing and Validating Command-Line Arguments
+
+After declaring shared variables, the `main` function proceeds with parsing and validating command-line arguments by calling the following function:  
+
+```c
+/* Parse and validate arguments, initialize map and player positions */
+if (argParser(argc, argv, map_size, player_pos, goal_pos)) {
+    ...
+}
+```
+
+---
+
+### Function Overview
+
+#### `argParser` Declaration
+
+The function is declared in `utils.h` as follows:  
+```c
+unsigned char argParser(int argc, char **argv, unsigned short map_size[2], unsigned short player_pos[2], unsigned short goal_pos[2]);
+```  
+
+#### Parameters Explained
+1. **`argc` and `argv`**  
+   - Passed directly from the `main` function.  
+   - `argc`: The number of command-line arguments.  
+   - `argv`: An array of strings containing the arguments.  
+
+2. **`map_size[2]`, `player_pos[2]`, `goal_pos[2]`**  
+   - Arrays to hold:  
+     - `map_size`: The number of rows and columns of the map.  
+     - `player_pos`: The initial row and column of the player.  
+     - `goal_pos`: The fixed row and column of the goal.  
+   - Arrays are passed by reference in C, meaning the function can directly update their values.  
+
+---
+
+### What the Function Does
+1. **Parses Command-Line Arguments**  
+   - Extracts the values of map dimensions, player position, and goal position from the `argv` array.  
+
+2. **Validates Arguments**  
+   - Ensures that:  
+     - All required arguments are present.  
+     - Arguments are of the correct type (e.g., positive integers).  
+     - Arguments fall within acceptable ranges.  
+   - Handles errors related to argument count and invalid values.  
+
+3. **Updates Shared Variables**  
+   - Updates the values of `map_size`, `player_pos`, and `goal_pos` based on the validated arguments.  
+
+4. **Returns Success or Failure**  
+   - Returns `1` (true) if all arguments are valid.  
+   - Returns `0` (false) if any validation fails.  
+
+---
+
+### Key Design Decision
+
+#### **Why Use Arrays for Data Pairs?**  
+- Arrays in C work as memory pointers.  
+- Passing an array does not copy its values but provides the function with access to the array's base memory address.  
+- This allows efficient updates to the original array elements within the function, simplifying code and avoiding the overhead of copying data.  
+
+#### Error Handling
+- Errors are handled gracefully by printing appropriate error messages without exiting the program.  
+
+---
+
+### Looking Ahead
+To fully understand the functionality of `argParser`, the next step is to analyze its **definition** in `utils.c`.  
+
+---
+
+### 5. Parsing and Validating Arguments (Detailed Explanation)
+
+Within `utils.c`, the `argParser` function defines the core logic to parse and validate command-line arguments. Here's a detailed breakdown of its implementation.  
+
+---
+
+#### Variable Declaration
+
+```c
+unsigned char return_val = 1;
+int tmp_val;        /* Temporary variable for parsing */
+char *endptr;       /* Pointer to track invalid characters during conversion */
+```
+
+1. **`return_val`**:  
+   - Initialized to `1` (success).  
+   - Used to indicate whether parsing and validation are successful (1) or not (0).  
+   - Avoids multiple `return` statements, improving readability and maintainability.
+
+2. **`tmp_val`**:  
+   - A temporary signed integer to store intermediate parsed values.  
+   - Using a signed type ensures we can catch negative input values before casting to `unsigned short`.  
+
+3. **`endptr`**:  
+   - Tracks invalid characters during conversions using `strtol`.  
+   - Essential for error handling when parsing strings to numbers.  
+
+---
+
+#### Step 1: Checking Argument Count
+
+```c
+if (argc != 7) /* Expecting 6 arguments (7 including program name) */
+{
+    printf("Error: Invalid number of arguments!\n");
+    return_val = 0;
+}
+```
+
+- The program expects **6 command-line arguments**:
+  - `map rows`, `map columns`, `player row`, `player column`, `goal row`, and `goal column`.  
+  - Including the executable name, `argc` should equal 7.  
+- If not, an error message is printed, and `return_val` is updated to `0`.
+
+---
+
+#### Step 2: Parsing and Validating Individual Arguments
+
+Each argument is processed in the following steps:  
+
+1. Parse the argument using `strtol`:  
+   ```c
+   tmp_val = strtol(argv[i], &endptr, 10);
+   ```
+   - Converts the string argument to an integer (`base 10`).  
+   - `endptr` points to any invalid character in the input.  
+
+2. Check for invalid characters:  
+   ```c
+   if (*endptr != '\0') /* Check for invalid characters */
+   {
+       printf("Error: Invalid argument for map rows, %s\n", endptr);
+       return_val = 0;
+   }
+   ```
+
+3. Validate the value (e.g., non-negative, within a valid range):  
+   ```c
+   if (tmp_val < 5) /* Example for map rows/columns */
+   {
+       printf("Error: Map rows cannot be less than 5!\n");
+       return_val = 0;
+   }
+   ```
+
+4. Cast the validated value to `unsigned short` and update the corresponding shared variable:  
+   ```c
+   map_size[0] = (unsigned short)tmp_val;
+   ```
+
+The process is repeated for:  
+- **`map rows` (argv[1])**  
+- **`map columns` (argv[2])**  
+- **`player row` (argv[3])**  
+- **`player column` (argv[4])**  
+- **`goal row` (argv[5])**  
+- **`goal column` (argv[6])**  
+
+---
+
+#### Step 3: Additional Validations
+
+If all arguments are parsed successfully (`return_val` is still 1), further checks are performed:  
+
+```c
+if (return_val)
+{
+    /* Validate player position within map bounds */
+    if (player_pos[0] >= map_size[0] || player_pos[1] >= map_size[1])
+    {
+        printf("Error: Player is out of bounds!\n");
+        return_val = 0;
+    }
+
+    /* Validate goal position within map bounds */
+    if (goal_pos[0] >= map_size[0] || goal_pos[1] >= map_size[1])
+    {
+        printf("Error: Goal is out of bounds!\n");
+        return_val = 0;
+    }
+
+    /* Ensure player and goal positions are not the same */
+    if (return_val && (memcmp(player_pos, goal_pos, sizeof(unsigned short) * 2) == 0))
+    {
+        printf("Error: Player and Goal positions can't be the same!\n");
+        return_val = 0;
+    }
+}
+```
+
+1. **Bounds Check**  
+   - Ensures that player and goal positions are within the map dimensions.  
+   - Prints errors if out of bounds.  
+
+2. **Player and Goal Overlap**  
+   - Uses `memcmp` to compare `player_pos` and `goal_pos` arrays.  
+   - If the positions are identical, an error message is displayed.  
+
+---
+
+#### Final Step: Return the Result
+
+```c
+return return_val;
+```
+
+- Returns `1` if all validations pass.  
+- Returns `0` if any error is encountered.  
+
+---
+
+### Key Design Choices
+
+1. **`strtol` over `atoi`**:  
+   - Provides better error handling by detecting invalid characters in input via `endptr`.  
+
+2. **Signed Temporary Variable (`tmp_val`)**:  
+   - Enables detection of negative input values before casting to `unsigned short`.  
+
+3. **Error Handling Strategy**:  
+   - Errors are handled for each argument individually.  
+   - This approach ensures all errors are reported instead of stopping at the first error.  
+
+4. **`memcmp` for Array Comparison**:  
+   - Simplifies checking if two arrays (e.g., `player_pos` and `goal_pos`) have identical values.  
+
+---
+
+### 6. GRID.c
+
+Here's a refined version of your paragraph:
+
+---
+
+Before we return to the main loop in `main.c`, let's first delve into `grid.c` and explain the functions defined there. These functions, which are declared in `grid.h`, handle grid-related and game-related functionalities essential to the game's logic. Below are the function declarations outlined in `grid.h`:
+
+```c
+char **initGrid(unsigned short map_size[2], unsigned short player_pos[2], unsigned short goal_pos[2]);
+void printGrid(char **grid, unsigned short map_size[2]);
+void movePlayer(char user_input, char **grid, unsigned short map_size[2], unsigned short player_pos[2]);
+void freeGrid(char **grid, unsigned short map_size[2]);
+unsigned char winOrLose(char **grid, unsigned short map_size[2], unsigned short player_pos[2], unsigned short goal_pos[2;
+```
+
+To provide a brief overview:
+
+- **`initGrid`** initializes the grid by taking the already initialized `map_size`, `player_pos`, and `goal_pos`.  
+- **`movePlayer`** updates the player's position based on the user's input and visually reflects this change on the grid.  
+- **`freeGrid`** clears the memory allocated for the grid during initialization to manage resources efficiently.  
+- **`winOrLose`** checks if the player has won or lost by determining if they have reached the goal, marking the game's completion.
+
+Let's dive into the definitions of each function and gain a deeper understanding of their implementation and purpose within the game.
+
+#### initGrid
+
+Let's dive into the `initGrid` function, breaking down each part of the code for a clearer understanding.
+
+**Memory Allocation for the Grid**
+
+```c
+unsigned short row;
+char **grid = (char **)malloc(sizeof(char *) * map_size[0]);
+```
+
+- Here, we first declare a `row` variable which will be used later in loops. The more critical part is the allocation of memory for `grid`. We allocate memory for an array of `char *` (pointers to `char`), with the number of rows determined by `map_size[0]`. This allocation is done using `malloc`, which requests memory from the heap (as opposed to the stack, where local variables are stored). 
+
+- The reason for using `malloc` is to allow for dynamic memory allocation at runtime, ensuring the grid can be sized based on user input. We cast the result of `malloc` to `(char **)` as a good C programming practice since `malloc` returns a `void *`, which needs to be cast to the desired pointer type.
+
+**Error Handling for Memory Allocation**
+
+```c
+if (grid != NULL) 
+{
+    /* proceed with grid initialization */
+}
+else
+{
+    printf("Error: Failure in allocating memory for grid!\n");
+}
+```
+
+Once memory is allocated, we check if the `grid` pointer is still not `NULL`. This check is necessary because `malloc` does not raise an error if memory allocation fails; it simply returns `NULL`. If the memory allocation fails, we print an error message. This ensures that the program doesn't proceed with invalid memory references.
+
+**Memory Allocation for Rows and Columns**
+
+```c
+for (row = 0; row < map_size[0]; row++)
+{
+    grid[row] = (char *)malloc(sizeof(char) * map_size[1]);
+
+    if (grid[row] != NULL)
+    {
+        memset(grid[row], ' ', map_size[1]);
+        /* Place player and goal */
+    }
+    else
+    {
+        map_size[0] = row;
+        freeGrid(grid, map_size);
+        grid = NULL;
+        printf("Error: Failure in allocating memory for grid row! row=%u\n", row);
+        row = map_size[0] - 1;
+    }
+}
+```
+
+- After successfully allocating memory for the grid itself, we need to allocate memory for each row individually. Each row is essentially a `char *`, so we allocate memory for the columns in each row (using `map_size[1]` to determine the number of columns). We check again if the memory allocation for each row succeeds. If not, we clean up any previously allocated memory using `freeGrid`, set `grid` to `NULL`, and print an error message.
+
+- The reason we handle this row-by-row allocation is that the grid is a `char **`, meaning it's a pointer to an array of pointers. Each row is essentially a separate array, so we need to allocate memory for each of these rows individually.
+
+**Row Initialization and Placement of Player/Goal**
+
+```c
+memset(grid[row], ' ', map_size[1]);
+if (row == player_pos[0])
+{
+    grid[player_pos[0]][player_pos[1]] = 'P';
+}
+if (row == goal_pos[0])
+{
+    grid[goal_pos[0]][goal_pos[1]] = 'G';
+}
+```
+
+Once memory is successfully allocated for a row, we initialize it using `memset`, which fills the entire row with spaces (`' '`) to represent empty spaces on the grid. Then, we check if the current row matches the player's row (`player_pos[0]`) or the goal's row (`goal_pos[0]`). If so, we place the player (`'P'`) or the goal (`'G'`) at the respective positions by updating the values in the grid.
+
+**Handling Memory Allocation Failure**
+
+If the memory allocation for any row fails, we do the following:
+
+```c
+map_size[0] = row;
+freeGrid(grid, map_size);
+grid = NULL;
+printf("Error: Failure in allocating memory for grid row! row=%u\n", row);
+row = map_size[0] - 1;
+```
+
+In the case where a row's memory allocation fails, we set `map_size[0]` to the current row index and call `freeGrid` to free any memory that was allocated up to that point. We also set `grid` to `NULL` to avoid potential issues with invalid pointers. To stop the loop from continuing after a failure, we adjust the `row` variable to `map_size[0] - 1`, effectively breaking out of the loop.
+
+**Returning the Grid**
+
+Finally, if everything succeeds, we return the allocated and populated grid:
+
+```c
+return grid;
+```
+
+The `grid` now holds the dynamic memory for all rows and columns, with the player and goal placed at the correct positions. This grid will be used throughout the game to represent the map and interact with the player.
+
+---
+
+**Key Points**
+
+- ***Memory Allocation**: `malloc` is used to dynamically allocate memory for the grid, allowing for flexibility based on user input.*
+- ***Error Handling**: We handle memory allocation errors by checking if `malloc` returns `NULL`, ensuring that the program does not proceed with invalid memory.*
+- ***Row-by-Row Allocation**: Memory for each row is allocated separately because the grid is a pointer to an array of pointers.*
+- ***Initialization**: After allocation, the rows are initialized with spaces (`' '`) to represent empty cells, and the player and goal positions are set accordingly.*
+
+---
+
+#### printGrid
+
+In the `printGrid` function, we utilize the already initialized grid and the `map_size` data to display the current state of the game. Here's a breakdown of how the function works:
+
+
+**Variable Declarations**
+
+```c
+unsigned short i;
+char *h_border = malloc(sizeof(char) * (map_size[1] + 2));
+```
+
+- **`i`**: This variable is used as a loop counter later in the function.
+- **`h_border`**: This dynamically allocated string is used to represent the horizontal border of the grid. The size of the border is based on the number of columns (`map_size[1]`) plus two additional characters for the edges (`*` at the beginning and end).
+
+Dynamic allocation is used for `h_border` because the grid size is not known at compile time, and this approach ensures the border can adapt to any grid size.
+
+
+**Setting the Border Value**
+
+To initialize `h_border`:
+
+```c
+memset(h_border, '*', map_size[1] + 2);
+h_border[map_size[1] + 2 - 1] = '\0';
+```
+
+- `memset` is used to fill the `h_border` string with the `'*'` character, creating a visual boundary for the grid.
+- The last character is set to `'\0'` to properly terminate the string.
+
+**Printing the Grid**
+
+```c
+system("clear");
+
+printf("%s\n", h_border);
+for (i = 0; i < map_size[0]; i++)
+{
+    printf("*%s*\n", grid[i]);
+}
+printf("%s\n", h_border);
+```
+
+- **`system("clear")`**: This makes a system call to clear the console screen, ensuring the grid is displayed cleanly. On Unix-based systems, the `"clear"` command works to refresh the screen.
+- **`printf("%s\n", h_border)`**: Prints the top border of the grid using the `h_border` string.
+- **`for` loop**: Iterates through each row of the grid (`grid[i]`) and prints it. The format string `"*%s*"` adds `'*'` to the beginning and end of each row, creating the appearance of vertical borders.
+- **Bottom border**: The final `printf` prints the bottom border using the same `h_border` string.
+
+**Key Points**
+
+- ***Dynamic Border Creation**: By dynamically allocating `h_border` and setting its value using `memset`, we ensure that the border size matches the grid's width (`map_size[1]`), making the function adaptable to different map sizes.*
+- ***String Formatting**: Each row of the grid is treated as a string (a null-terminated `char` array), which simplifies printing the grid contents row by row.*
+- ***System Command**: The `system("clear")` call is used for aesthetic purposes to refresh the terminal screen before printing the updated grid. This ensures that every grid update looks clean without cluttering the terminal.*
+
+---
+
+#### breakFloor
+
+The `breakFloor` function is not directly called in `main.c` but is utilized within `movePlayer`. Its primary purpose is to randomly "break" a floor tile by marking it with an `'X'`. Here's the function definition with an explanation:
+
+**Function Definition**
+
+```c
+void breakFloor(char **grid, unsigned short map_size[2])
+{
+    unsigned short x_pos[2];
+    unsigned char unique = 0;
+
+    /* Find a random empty spot and place an 'X' */
+    while (!unique)
+    {
+        x_pos[0] = random(0, map_size[0] - 1);
+        x_pos[1] = random(0, map_size[1] - 1);
+
+        if (grid[x_pos[0]][x_pos[1]] == ' ')
+        {
+            grid[x_pos[0]][x_pos[1]] = 'X';
+            unique = 1;
+        }
+    }
+}
+```
+
+
+**Purpose**:
+- The function randomly selects a position in the grid and marks it with an `'X'`, representing a broken floor tile.
+- The position must be an empty space (`' '`) to avoid overwriting other elements like the player (`'P'`) or the goal (`'G'`).
+
+**Random Position Generation**:
+- `random(0, map_size[0] - 1)` generates a random row index.
+- `random(0, map_size[1] - 1)` generates a random column index.
+- These values are stored in the `x_pos` array, representing the randomly chosen position in the grid.
+
+**Ensuring a Valid Position**:
+- The `while (!unique)` loop continues until a valid, unique empty position is found.
+- Inside the loop, if the randomly selected position corresponds to an empty space (`' '`), the position is marked as `'X'`, and the `unique` flag is set to `1` to exit the loop.
+
+**Using a Random Number Generator**:
+- The `random` function (assumed to be from an external library) is used to generate random integers within the specified range. This ensures that the position is within the grid's bounds.
+
+---
+
+#### _borderless
+
+The `_borderless` function is used within the `movePlayer` function when the `BORDERLESS` condition is enabled. This function ensures that if the player attempts to move beyond the grid's boundaries, their position "wraps around" to the opposite side, creating a seamless transition across rows or columns.
+
+**Function Definition**
+
+```c
+void _borderless(int pos[2], unsigned short map_size[2])
+{
+    if (pos[0] < 0)
+    {
+        pos[0] = map_size[0] - 1; // Wrap around to the bottom row
+    }
+    else if (pos[0] >= map_size[0])
+    {
+        pos[0] = 0; // Wrap around to the top row
+    }
+
+    if (pos[1] < 0)
+    {
+        pos[1] = map_size[1] - 1; // Wrap around to the rightmost column
+    }
+    else if (pos[1] >= map_size[1])
+    {
+        pos[1] = 0; // Wrap around to the leftmost column
+    }
+}
+```
+
+**Explanation of Behavior**
+
+- **Inputs**:
+   - `pos[2]`: The player's current position represented as a 2D coordinate `[row, column]`.
+   - `map_size[2]`: The grid's dimensions `[number of rows, number of columns]`.
+
+- **Purpose**:
+   - This function adjusts the player's position if they attempt to move out of bounds, wrapping them around to the other side of the grid.
+   - The function accounts for both row (`pos[0]`) and column (`pos[1]`) movements.
+
+- **How It Works**:
+   - For the **row index** (`pos[0]`):
+     - If `pos[0]` is less than `0` (above the top row), it is wrapped to the bottom row (`map_size[0] - 1`).
+     - If `pos[0]` exceeds the last row (`map_size[0]`), it is wrapped to the top row (`0`).
+   - For the **column index** (`pos[1]`):
+     - If `pos[1]` is less than `0` (left of the first column), it is wrapped to the rightmost column (`map_size[1] - 1`).
+     - If `pos[1]` exceeds the last column (`map_size[1]`), it is wrapped to the first column (`0`).
+
+- **Effect**:
+   - The result is a "borderless" behavior where the grid loops in both directions:
+     - Moving out of the top boundary places the player at the bottom.
+     - Moving out of the bottom boundary places the player at the top.
+     - Moving out of the left boundary places the player at the rightmost side.
+     - Moving out of the right boundary places the player at the leftmost side.
+
+**Example**
+
+For a grid of size `5x5` (`map_size[0] = 5`, `map_size[1] = 5`):
+
+| Initial Position (`pos`) | Movement       | Adjusted Position (`pos`) |
+|--------------------------|----------------|---------------------------|
+| `[0, 2]`                | Up (row -1)    | `[4, 2]` (bottom wrap)    |
+| `[4, 2]`                | Down (row +1)  | `[0, 2]` (top wrap)       |
+| `[2, 0]`                | Left (col -1)  | `[2, 4]` (right wrap)     |
+| `[2, 4]`                | Right (col +1) | `[2, 0]` (left wrap)      |
+
+---
+
+#### movePlayer
+
+The `movePlayer` function is responsible for managing the player's movement based on user input, updating their position on the grid, and ensuring that movement adheres to specific game rules. Below is a detailed breakdown of the function.
+
+
+**Variable Declarations**
+
+```c
+int future_pos[2];
+
+future_pos[0] = (int)player_pos[0];
+future_pos[1] = (int)player_pos[1];
+```
+
+- **Purpose of `future_pos`:**
+   - This variable temporarily holds the player's potential next position on the grid, based on their current position (`player_pos`) and input direction.
+   - Declared as `int` to handle edge cases where calculations might result in negative values, especially for borderless movement.
+
+- **Why `int` instead of `unsigned short`?**
+   - Using `unsigned short` for `future_pos` could cause issues when subtracting values at the grid's edges:
+     - For example, if `player_pos[0]` is `0` and the player attempts to move up (`future_pos[0]--`), the result would underflow to `65535` (maximum value for `uint16_t`), causing a bug.
+   - With `int`, negative values can be represented, which is particularly useful for handling conditions like wrapping in borderless mode.
+
+**Switch Case for Input Handling**
+
+```c
+switch (user_input)
+{
+case 'w':
+    future_pos[0]--; // Move up
+    break;
+
+case 's':
+    future_pos[0]++; // Move down
+    break;
+
+case 'a':
+    future_pos[1]--; // Move left
+    break;
+
+case 'd':
+    future_pos[1]++; // Move right
+    break;
+
+default:
+    break;
+}
+```
+
+- **Switch-Case over If-Else:**
+   - Switch statements are more efficient for multiple discrete cases compared to `if-else` chains.
+   - Each case corresponds to a valid movement:
+     - `'w'`: Decrease the row index to move up.
+     - `'s'`: Increase the row index to move down.
+     - `'a'`: Decrease the column index to move left.
+     - `'d'`: Increase the column index to move right.
+
+- **Result:**
+   - The `future_pos` array is updated to reflect the intended movement direction.
+
+**Macro Conditional for Borderless Mode**
+
+```c
+#ifdef BORDERLESS
+    _borderless(future_pos, map_size);
+#endif
+```
+
+- **Explanation:**
+   - The `#ifdef BORDERLESS` directive ensures that the `_borderless` function is called only if `BORDERLESS` mode is enabled during compilation.
+   - `_borderless` adjusts the `future_pos` so that if the player moves out of bounds, they "wrap around" to the other side of the grid.
+     - For example:
+       - Moving up from the top row wraps the player to the bottom row.
+       - Moving right from the last column wraps the player to the first column.
+
+- **Purpose:**
+   - This condition makes the game grid borderless and adds a dynamic gameplay element.
+
+---
+
+**Validating and Moving the Player**
+
+```c
+if (!(future_pos[0] == (int)player_pos[0] && future_pos[1] == (int)player_pos[1]) &&
+    future_pos[0] >= 0 && future_pos[0] < map_size[0] &&
+    future_pos[1] >= 0 && future_pos[1] < map_size[1] &&
+    grid[future_pos[0]][future_pos[1]] != 'X')
+{
+    grid[player_pos[0]][player_pos[1]] = ' '; /* Clear the player's current position */
+    player_pos[0] = (unsigned short)future_pos[0]; /* Update player row position */
+    player_pos[1] = (unsigned short)future_pos[1]; /* Update player column position */
+    grid[player_pos[0]][player_pos[1]] = 'P'; /* Place the player in the new position */
+
+    breakFloor(grid, map_size); /* Introduce a new broken floor tile */
+}
+```
+
+- **Condition Breakdown:**
+   - Ensures that:
+     1. The player is attempting to move (i.e., `future_pos` is not equal to `player_pos`).
+     2. The `future_pos` is within the grid's valid range (`>= 0` and `< map_size`).
+     3. The target cell (`grid[future_pos[0]][future_pos[1]]`) is not a broken floor (`'X'`).
+
+- **Actions If Valid:**
+   - **Clear the current position:** 
+     - The cell where the player was located is reset to `' '` (empty space).
+   - **Update player position:**
+     - `player_pos` is updated to `future_pos` for both row and column indices.
+   - **Place the player in the new position:**
+     - The cell at `future_pos` is updated to `'P'` to represent the player's presence.
+   - **Break a new floor tile:**
+     - `breakFloor` is called to randomly select an empty space on the grid and mark it as a broken floor (`'X'`).
+
+Once validated, the function updates the grid to reflect the player's new position and introduces a broken floor tile for added gameplay complexity.
+
+---
+
+#### freeGrid
+
+The `freeGrid` function is responsible for properly deallocating memory that was dynamically allocated for the grid, thereby preventing memory leaks. Below is a detailed breakdown of how this function works and why it is structured this way.
+
+
+**Function Definition**
+
+```c
+void freeGrid(char **grid, unsigned short map_size[2])
+{
+    unsigned short i;
+
+    if (grid != NULL)
+    {
+        for (i = 0; i < map_size[0]; i++)
+        {
+            free(grid[i]); // Free each row of the grid
+        }
+
+        free(grid); // Free the entire grid array
+        grid = NULL; // Set grid pointer to NULL
+    }
+}
+```
+
+**Explanation**
+
+- **Parameter Details:**
+   - `char **grid`: This is a pointer to an array of pointers representing the 2D grid.
+   - `unsigned short map_size[2]`: An array representing the grid dimensions `[rows, columns]`.
+
+- **Purpose:**
+   - The function deallocates memory row-by-row, followed by deallocating the entire grid pointer itself.
+   - Ensures proper memory management by freeing each row individually before freeing the main pointer.
+
+- **How It Works:**
+   - **Check if `grid` is not NULL:** 
+     - This prevents trying to free memory that hasn't been allocated or has already been freed, which could lead to undefined behavior or a program crash.
+   - **Iterate through each row:**
+     - The loop runs from `0` to `map_size[0] - 1`, representing the number of rows.
+     - Each row (`grid[i]`) is freed individually. This is crucial because the grid is an array of pointers, and each pointer points to a dynamically allocated array.
+   - **Free the entire grid pointer:**
+     - After all rows are freed, the `grid` pointer itself is deallocated to release the memory used by the array of pointers.
+   - **Set `grid` to NULL:**
+     - Setting `grid` to `NULL` after freeing it helps prevent dangling pointers, making the code safer and less error-prone.
+
+
+**Why Free Each Row Separately?**
+- The `grid` is a 2D array allocated using a series of `malloc` calls:
+  - First, memory is allocated for an array of pointers representing the rows.
+  - Then, each row itself is allocated separately.
+- This requires each row to be freed individually because `free` only releases memory that was allocated in a single `malloc` call. Freeing just `grid` without freeing the rows would lead to memory leaks.
+
+
+**Error Handling and Best Practices**
+- **`if (grid != NULL)`:** 
+  - This is an important check because attempting to free a `NULL` pointer has no effect, but it’s a good practice to ensure the pointer is valid.
+- **Set `grid` to `NULL`:**
+  - This is to prevent accidental access to freed memory, which could lead to undefined behavior.
+
+---
+
+#### winOrLose featuring `_isValid` and `_dfs`
+
+The `winOrLose` function determines the outcome of the game by checking whether the player erached the goal or can reach the goal position (`G`) on the grid. It uses two helper functions: `_isValid` and `_dfs`. Here's a breakdown of each function and how they collectively work to decide the game's state:
+
+---
+
+#### `_isValid`: Validate a Grid Position
+
+**Definition:**
+```c
+unsigned char _isValid(int pos[2], unsigned char **visited, char **grid, unsigned short map_size[2])
+{
+    return pos[0] >= 0 && pos[0] < map_size[0] &&
+           pos[1] >= 0 && pos[1] < map_size[1] &&
+           grid[pos[0]][pos[1]] != 'X' && 
+           !visited[pos[0]][pos[1]];
+}
+```
+
+**Explanation:**
+- **Purpose:** Checks if a given position on the grid is:
+  1. Within the grid boundaries.
+  2. Not a blocked cell (`X`).
+  3. Not already visited during the search.
+- **Parameters:**
+  - `pos[2]`: The position being validated.
+  - `visited`: A 2D array marking visited cells.
+  - `grid`: The grid containing the player's current state.
+  - `map_size`: The size of the grid.
+- **Returns:** 
+  - `1` (true) if the position is valid.
+  - `0` (false) otherwise.
+
+---
+
+#### `_dfs`: Depth-First Search
+
+**Definition:**
+```c
+unsigned char _dfs(int pos[2], unsigned char **visited, char **grid, unsigned short map_size[2])
+```
+
+**Explanation:**
+- **Purpose:** Implements a recursive **Depth-First Search (DFS)** algorithm to explore paths from the player's position to the goal.
+- **Parameters:**
+  - `pos[2]`: The current position during the DFS.
+  - `visited`: A 2D array marking visited cells.
+  - `grid`: The grid containing the player's current state.
+  - `map_size`: The size of the grid.
+- **Steps:**
+  1. **Borderless Mode (Optional):** 
+     - If `BORDERLESS` is defined, calls `_borderless` to handle out-of-bound positions by wrapping them around.
+  2. **Validate Position:** 
+     - Calls `_isValid` to ensure the current position is within bounds, not blocked, and unvisited.
+  3. **Goal Check:**
+     - If the current position is the goal (`G`), the search ends successfully.
+  4. **Recursive Exploration:**
+     - Marks the current cell as visited and recursively explores all four directions:
+       - **Up:** `(pos[0] - 1, pos[1])`
+       - **Down:** `(pos[0] + 1, pos[1])`
+       - **Left:** `(pos[0], pos[1] - 1)`
+       - **Right:** `(pos[0], pos[1] + 1)`
+     - The recursion stops as soon as a path to the goal is found.
+  5. **Return:** 
+     - Returns `1` (true) if a path to the goal is found, otherwise `0`.
+
+---
+
+#### `winOrLose`: Determine Game State
+
+**Definition:**
+```c
+unsigned char winOrLose(char **grid, unsigned short map_size[2], unsigned short player_pos[2], unsigned short goal_pos[2])
+```
+
+**Explanation:**
+- **Purpose:** Determines if the player reached the goal or can reach the goal or not by using the DFS algorithm.
+- **Parameters:**
+  - `grid`: The grid containing the current game state.
+  - `map_size`: The size of the grid.
+  - `player_pos`: The player's current position.
+  - `goal_pos`: The goal's position.
+- **Steps:**
+  1. **Allocate `visited` Array:**
+     - Dynamically allocates a 2D `visited` array to track cells visited during the DFS. Each cell is initialized to `0` using `memset`.
+  2. **Immediate Win Check:**
+     - Compares `player_pos` and `goal_pos`. If they are the same, prints "You Win!" and returns `1`.
+  3. **Call `_dfs`:**
+     - Initiates a DFS from the player's current position to search for a path to the goal.
+     - If `_dfs` returns `0` (no path found), prints "You Lose!" and sets the return value to `1`.
+  4. **Free Memory:**
+     - Frees the dynamically allocated `visited` array to prevent memory leaks.
+  5. **Return:** 
+     - Returns `1` if the game state has been determined (win or lose), otherwise `0`.
+
+---
+
+**How They Work Together**
+
+1. **`winOrLose`:**
+   - Called from the main game loop to determine if the game has reached an end state.
+   - Prepares the necessary data (like `visited` array) and checks for an immediate win condition.
+
+2. **`_dfs`:**
+   - Executes the actual pathfinding to check if the goal is reachable from the player's current position.
+   - Handles recursion, marking visited cells, and navigating the grid.
+
+3. **`_isValid`:**
+   - Ensures that each position visited during DFS is valid (within bounds, not blocked, and unvisited).
+
+Together, these functions enable the program to decide whether the player has won, lost, or can continue the game.

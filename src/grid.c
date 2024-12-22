@@ -269,11 +269,14 @@ unsigned char winOrLose(char **grid, unsigned short map_size[2], unsigned short 
 	/* Check if player is at goal position */
 	if (memcmp(player_pos, goal_pos, sizeof(unsigned short) * 2) == 0)
 	{
+
+		printf("You Win!\n");
 		return_val = 1;
 	}
 	else if (!_dfs(int_pos, visited, grid, map_size))
 	{
-		return_val = 2; /* Player cannot reach goal */
+		printf("You Lose!\n");
+		return_val = 1; /* Player cannot reach goal */
 	}
 
 	/* Free memory */
