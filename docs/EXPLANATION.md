@@ -535,7 +535,6 @@ return return_val;
 
 Here's a refined version of your paragraph:
 
----
 
 Before we return to the main loop in `main.c`, let's first delve into `grid.c` and explain the functions defined there. These functions, which are declared in `grid.h`, handle grid-related and game-related functionalities essential to the game's logic. Below are the function declarations outlined in `grid.h`:
 
@@ -555,6 +554,8 @@ To provide a brief overview:
 - **`winOrLose`** checks if the player has won or lost by determining if they have reached the goal, marking the game's completion.
 
 Let's dive into the definitions of each function and gain a deeper understanding of their implementation and purpose within the game.
+
+---
 
 #### initGrid
 
@@ -653,7 +654,6 @@ return grid;
 
 The `grid` now holds the dynamic memory for all rows and columns, with the player and goal placed at the correct positions. This grid will be used throughout the game to represent the map and interact with the player.
 
----
 
 **Key Points**
 
@@ -1018,7 +1018,7 @@ The `winOrLose` function determines the outcome of the game by checking whether 
 
 ---
 
-#### `_isValid`: Validate a Grid Position
+##### `_isValid`: Validate a Grid Position
 
 **Definition:**
 ```c
@@ -1047,7 +1047,7 @@ unsigned char _isValid(int pos[2], unsigned char **visited, char **grid, unsigne
 
 ---
 
-#### `_dfs`: Depth-First Search
+##### `_dfs`: Depth-First Search
 
 **Definition:**
 ```c
@@ -1080,7 +1080,7 @@ unsigned char _dfs(int pos[2], unsigned char **visited, char **grid, unsigned sh
 
 ---
 
-#### `winOrLose`: Determine Game State
+##### `winOrLose`: Determine Game State
 
 **Definition:**
 ```c
@@ -1109,7 +1109,7 @@ unsigned char winOrLose(char **grid, unsigned short map_size[2], unsigned short 
 
 ---
 
-**How They Work Together**
+#### How They Work Together
 
 1. **`winOrLose`:**
    - Called from the main game loop to determine if the game has reached an end state.
