@@ -183,8 +183,6 @@ This program integrates modular functions for each component, enabling a clear a
   - Files like `grid.c`, `utils.c`, and `main.c` are named based on their responsibilities, making it intuitive to locate functions and logic.
   - Variable names such as `map_size`, `player_pos`, and `goal_pos` are chosen for clarity and ease of understanding.
 
-Here’s a refined and updated explanation for your **Step-by-Step Logical Flow**, incorporating your description and adding structure:  
-
 ---
 
 ## Step-by-Step Logical Flow  
@@ -1256,7 +1254,7 @@ char getUserInput()
 
 In C, the `return 0;` statement in a function, typically in the `main` function, serves a specific purpose related to the program's execution status. Let me break it down:
 
-![Let me break it down](https://media1.tenor.com/m/nep7WtDOM70AAAAC/benson-regular-show.gif)
+<img src="https://media1.tenor.com/m/nep7WtDOM70AAAAC/benson-regular-show.gif" alt="Let me break it down" />
 
 ---
 
