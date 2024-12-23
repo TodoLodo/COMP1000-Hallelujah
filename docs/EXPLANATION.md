@@ -1328,7 +1328,7 @@ The value returned by the `main` function serves as an **exit status** for the p
 
 ---
 
-## 5. <img src="/images/mrd.png" alt="Make it. Run It. Done." style="height:50px;"/>
+## 5. <img src="/images/mrd.png" alt="Make it. Run It. Done." style="height:30px;"/>
 
 
 
