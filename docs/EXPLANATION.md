@@ -166,9 +166,9 @@ This program integrates modular functions for each component, enabling a clear a
 
 ### d. Main Loop and Termination Handling
 - **Reasoning**:  
-  - Since the assignment prohibits the use of `exit()` or returning from the main function to terminate the program, a boolean-like variable is used to control the main loop.
+  - Since the assignment prohibits the use of `exit()` or returning from the main function to terminate the program, the win or lose condition will be used to control the main loop.
 - **Implementation**:  
-  - **`game_running`**: A variable initialized to `1` (true). The main loop continues running as long as this variable remains true. It is set to `0` (false) when a win or lose condition is met.
+  - **`winOrLose`**: The `winOrLose` function will return 1 if a win or lose condition is met, and 0 to continue the game. This return value will be used in the `while` loop condition, so when the condition is met, the loop will terminate, stopping the game.
 
 ### e. Grid Representation
 - **Reasoning**:  
@@ -183,6 +183,12 @@ This program integrates modular functions for each component, enabling a clear a
 - **Implementation**:  
   - Files like `grid.c`, `utils.c`, and `main.c` are named based on their responsibilities, making it intuitive to locate functions and logic.
   - Variable names such as `map_size`, `player_pos`, and `goal_pos` are chosen for clarity and ease of understanding.
+  - **Naming conventions**:
+    - **Source files**: Lowercase naming (`grid.c`, `utils.c`, `main.c`).
+    - **Global variables/macros**: Uppercase naming (e.g., `MAX_SIZE`, `GAME_RUNNING`).
+    - **Function names**: Camel case (`initGrid`, `movePlayer`).
+    - **Function parameters/local variables**: Snake case (`player_pos`, `map_size`, `goal_pos`).
+
 
 ---
 
