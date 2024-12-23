@@ -1,4 +1,4 @@
-# COMP1000
+# ![banner](/images/banner.png)
 
 ## Overview
 This repository contains the assignments for the COMP1000 unit, organized by semester and year. Each assignment is in its own branch.
