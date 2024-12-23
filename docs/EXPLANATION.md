@@ -1328,7 +1328,8 @@ The value returned by the `main` function serves as an **exit status** for the p
 
 ---
 
-## 5. <span style="color: red;">Make it.</span> <span style="color: blue;">Run it.</span> <span style="color: green;">Done.</span>
+## 5. <img src="/images/mrd.png" alt="Make it. Run It. Done." style="height:50px;"/>
+
 
 
 To execute C code, we must first compile it. This is because C is a high-level language that needs to be translated into machine code for execution. This compilation process involves several steps:
