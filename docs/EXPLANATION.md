@@ -5,7 +5,7 @@
 2. [Approach and Logic](#2-approach-and-logic)
 3. [Pre-thinking and Design Decisions](#3-pre-thinking-and-design-decisions)
 4. [Step-by-Step Logical Flow](#4-step-by-step-logical-flow)
-5. [Make it. Run it. Done.](#5-make-it-run-it-done)
+5. [Make it. Run it. Done.](#5-)
 
 ---
 
@@ -1328,7 +1328,7 @@ The value returned by the `main` function serves as an **exit status** for the p
 
 ---
 
-## 5. <img src="/images/mrd.png" alt="Make it. Run It. Done." style="height:30px;"/>
+## 5. <img src="/images/mrd.png" alt="Make it. Run It. Done." style=""/>
 
 
 
