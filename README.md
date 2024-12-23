@@ -4,6 +4,12 @@
 
 This assignment involves developing a C program that implements a simple game to be played in the Linux terminal.
 
+---
+
+<span style="color: gray;"><i>For a detailed understanding of the code, refer to the [Explanation](/docs/EXPLANATION.md). To view a brief overview of the assignment specifications, see [Specifications](/docs/SPECIFICATION.md). For an in-depth understanding of the assignment requirements, consult the [UCP 2022 S2 Assignment PDF](/UCP_2022_S2_Assignment).</i></span>
+
+---
+
 ## Initial Setup
 
 You can either **download the assignment** or **clone the repository**:
@@ -170,6 +176,9 @@ make test_utils
 make test_grid
 ```
 
+---
+
+<span style="color: gray;"><i>For a detailed understanding of the code, refer to the [Explanation](/docs/EXPLANATION.md). To view a brief overview of the assignment specifications, see [Specifications](/docs/SPECIFICATION.md). For an in-depth understanding of the assignment requirements, consult the [UCP 2022 S2 Assignment PDF](/UCP_2022_S2_Assignment).</i></span>
 
 ---
 

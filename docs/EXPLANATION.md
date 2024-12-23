@@ -1,14 +1,15 @@
 # Mighty Explanation
 
 ## Table of Contents
-1. [Project Directory Structure](#project-directory-structure)
-2. [Approach and Logic](#approach-and-logic)
-3. [Pre-thinking and Design Decisions](#pre-thinking-and-design-decisions)
-4. [Step-by-Step Logical Flow](#step-by-step-logical-flow)
+1. [Project Directory Structure](#1-project-directory-structure)
+2. [Approach and Logic](#2-approach-and-logic)
+3. [Pre-thinking and Design Decisions](#3-pre-thinking-and-design-decisions)
+4. [Step-by-Step Logical Flow](#4-step-by-step-logical-flow)
+5. [Make it. Run it. Done.](#5-make-it-run-it-done)
 
 ---
 
-## Project Directory Structure
+## 1. Project Directory Structure
 
 The directory structure follows standard practices for organizing C projects, ensuring maintainability, clarity, and scalability. Here's the detailed breakdown:
 
@@ -28,37 +29,37 @@ The directory structure follows standard practices for organizing C projects, en
 
 ### Purpose of Each Folder
 
-1. **bin**
+- **bin**
     - Stores the compiled executables or binaries after the build process.
     - Keeps the main project directory clean by separating build artifacts from source code.
 
-2. **build**
+- **build**
     - Temporary build files generated during the compilation process, such as object files (`.o`) and dependency files.
     - Helps maintain a clear distinction between source code and intermediary compilation outputs.
 
-3. **docs**
+- **docs**
     - Includes all project documentation files, such as:
         - `EXPLANATION.md`: A deep dive into the project's design and logic.
         - `SPECIFICATION.md`: An overview of the project with instructions for setup and usage.
     - Can also store additional files like design documents or external references.
 
-4. **images**
+- **images**
     - Houses visual assets like diagrams, flowcharts, or screenshots used in documentation.
     - Useful for illustrating key concepts or providing visual aids for users.
 
-5. **include**
+- **include**
     - Contains all the header files (`.h`) used in the project.
     - Promotes modularity by allowing function declarations, macro definitions, and data structure declarations to be easily shared across multiple source files.
 
-6. **lib**
+- **lib**
     - Stores external or provided library code, including `.h` and `.c` files given as part of the assignment.
     - Keeps the project modular and organized by isolating reusable components.
 
-7. **src**
+- **src**
     - The main directory for source code files (`.c`) that implement the core functionality of the project.
     - Typically contains implementation code specific to your project objectives.
 
-8. **tests**
+- **tests**
     - Contains test cases to verify the functionality and correctness of the code.
     - May include unit tests, integration tests, or scripts to automate the testing process.
 
@@ -70,7 +71,7 @@ This structure:
 
 ---
 
-## Approach and Logic
+## 2. Approach and Logic
 
 ### **Objective**
 
@@ -85,41 +86,41 @@ The main goal of this program is to create an interactive terminal-based game ca
 
 ### Key Challenges and Solutions
 
-#### 1. Command-Line Argument Parsing
+#### Command-Line Argument Parsing
 - **Challenge**: Validate six numerical inputs for rows, columns, and positions for the player and goal.
 - **Solution**:  
   - Use `argc` and `argv` to check for the exact number of arguments.
   - Parse inputs using `atoi()`, ensuring proper integer conversion and range checks.
   - Handle invalid input gracefully with error messages and a loop prompting for corrections, avoiding abrupt program termination via `exit()`.
 
-#### 2. Map Interface Rendering
+#### Map Interface Rendering
 - **Challenge**: Dynamically display a 2D grid that updates after each player movement.
 - **Solution**:  
   - Use `*` for borders, `P` for the player, `G` for the goal, and `X` for collapsed grids.
   - Clear the terminal screen with `system("clear")` (Unix) before re-rendering the updated map.
   - Implement functions to generate the map, place the player and goal, and update the map after each turn.
 
-#### 3. User Input and Movement
+#### User Input and Movement
 - **Challenge**: Process valid movement commands while ignoring invalid ones, ensuring the player cannot move into borders or collapsed grids.
 - **Solution**:  
   - Use `scanf()` to read user input.
   - Map movement commands (`w`, `a`, `s`, `d`) to directional changes in the player's coordinates.
   - Check boundaries and prevent illegal movements with conditional statements.
 
-#### 4. Randomized Collapsing Floor
+#### Randomized Collapsing Floor
 - **Challenge**: Randomly collapse a floor grid after each movement, avoiding the player and goal positions.
 - **Solution**:  
   - Use a random number generator to select a non-collapsed grid position.
   - Ensure the chosen position does not overlap with the player or goal by validating against their coordinates.
   - Update the grid state with `X` for collapsed tiles.
 
-#### 5. Win/Lose Conditions
+#### Win/Lose Conditions
 - **Challenge**: Detect when the player has won or lost.
 - **Solution**:  
   - Win Condition: Check if the player's position matches the goal's coordinates after a move.
   - Lose Condition: Determine if all paths to the goal are blocked by collapsed grids, trapping the player or goal.
 
-#### 6. Conditional Compilation with BORDERLESS
+#### Conditional Compilation with BORDERLESS
 - **Challenge**: Allow the player to wrap around the map edges when the `BORDERLESS` feature is defined during compilation.
 - **Solution**:  
   - Use preprocessor directives (`#ifdef BORDERLESS`) to enable or disable this feature.
@@ -137,9 +138,9 @@ This program integrates modular functions for each component, enabling a clear a
 
 ---
 
-## Pre-thinking and Design Decisions
+## 3. Pre-thinking and Design Decisions
 
-### 1. Structuring Code into Multiple Files
+### a. Structuring Code into Multiple Files
 - **Reasoning**:  
   - To maintain readability and modularity, the main function should act as the central hub, only responsible for calling other structured code. It should not be overloaded with implementation details.
   - By splitting the code into multiple files, each dedicated to a specific responsibility, it becomes easier to manage, debug, and extend. This also aligns with the assignment criterion of having more than one or two `.c` files.
@@ -148,7 +149,7 @@ This program integrates modular functions for each component, enabling a clear a
   - **`utils.c`**: Manages command-line argument parsing, validation, and user input handling. Keeping utility functions separate improves clarity and avoids clutter in other files.
   - **`main.c`**: Contains the main function, the central loop, and declarations for shared variables. This file serves as the entry point for the program, providing a clear distinction of purpose.
 
-### 2. Logical Grouping of Related Data
+### b. Logical Grouping of Related Data
 - **Reasoning**:  
   - Although map rows, columns, player positions, and goal positions are given as separate command-line arguments, grouping them logically into arrays provides a more structured way to handle related data.
   - Arrays in C behave as memory pointers, simplifying function calls and value updates without needing to pass multiple separate variables.
@@ -156,27 +157,27 @@ This program integrates modular functions for each component, enabling a clear a
   - **`map_size[2]`**: Stores the number of rows and columns of the map.
   - **`player_pos[2]`** and **`goal_pos[2]`**: Hold the row and column coordinates of the player and goal respectively.
 
-### 3. Optimizing Memory Usage with Data Types
+### c. Optimizing Memory Usage with Data Types
 - **Reasoning**:  
   - The assignment specifies constraints on the map size, indicating that values will not exceed a 16-bit integer. Additionally, negative values are irrelevant for these variables.
   - Using `unsigned short` (16-bit) instead of `int` (32-bit) helps reduce memory consumption while ensuring the values fall within the expected range. The unsigned modifier ensures no negative values are possible, making the code more precise and efficient.
 - **Implementation**:  
   - **`unsigned short`** (equivalent to `uint16_t` in C99+): Used for `map_size`, `player_pos`, and `goal_pos` to minimize memory usage while meeting the program's requirements.
 
-### 4. Main Loop and Termination Handling
+### d. Main Loop and Termination Handling
 - **Reasoning**:  
   - Since the assignment prohibits the use of `exit()` or returning from the main function to terminate the program, a boolean-like variable is used to control the main loop.
 - **Implementation**:  
   - **`game_running`**: A variable initialized to `1` (true). The main loop continues running as long as this variable remains true. It is set to `0` (false) when a win or lose condition is met.
 
-### 5. Grid Representation
+### e. Grid Representation
 - **Reasoning**:  
   - The grid is the program's central element, representing the player, goal, borders, and collapsed floors. Using a 2D array of `char` simplifies visualization and ensures each element requires only 8 bits of memory.
   - Characters (`*`, `P`, `G`, `X`, and spaces) provide a straightforward way to represent the grid visually.
 - **Implementation**:  
   - **`char **grid`**: The 2D array holds the current state of the map. The size is determined by the command line arguments passed.
 
-### 6. Naming Conventions
+### f. Naming Conventions
 - **Reasoning**:  
   - File and variable names should clearly reflect their purpose. This makes the code easier to understand and navigate.
 - **Implementation**:  
@@ -185,9 +186,9 @@ This program integrates modular functions for each component, enabling a clear a
 
 ---
 
-## Step-by-Step Logical Flow  
+## 4. Step-by-Step Logical Flow  
 
-### 1. Including Necessary Headers  
+### i. Including Necessary Headers  
 At the beginning of `main.c`, the following headers are included to access essential functions and maintain modularity:  
 ```c  
 #include "utils.h"  
@@ -203,7 +204,7 @@ Refer to the respective files in the **`src`** directory and their declarations 
 
 ---
 
-### 2. Declaring the Main Function  
+### ii. Declaring the Main Function  
 The `main` function is defined with the following parameters:  
 ```c  
 int main(int argc, char **argv)  
@@ -216,7 +217,7 @@ This setup allows the program to dynamically read and process input from the use
 
 ---
 
-### 3. Declaring Key Variables  
+### iii. Declaring Key Variables  
 Inside the `main` function, the following variables are declared:  
 ```c   
 unsigned short map_size[2], player_pos[2], goal_pos[2];  /* Map dimensions and player/goal positions */  
@@ -264,7 +265,7 @@ char **grid = NULL;                                     /* Grid representation *
 
 ---
 
-### 4. Parsing and Validating Command-Line Arguments
+### iv. Parsing and Validating Command-Line Arguments
 
 After declaring shared variables, the `main` function proceeds with parsing and validating command-line arguments by calling the following function:  
 
@@ -329,7 +330,7 @@ To fully understand the functionality of `argParser`, the next step is to analyz
 
 ---
 
-### 5. Parsing and Validating Arguments (Detailed Explanation)
+### v. Parsing and Validating Arguments (Detailed Explanation)
 
 Within `utils.c`, the `argParser` function defines the core logic to parse and validate command-line arguments. Here's a detailed breakdown of its implementation.  
 
@@ -487,7 +488,7 @@ return return_val;
 
 ---
 
-### 6. GRID.c
+### vi. GRID.c
 
 Here's a refined version of your paragraph:
 
@@ -1080,7 +1081,7 @@ unsigned char winOrLose(char **grid, unsigned short map_size[2], unsigned short 
 
 Together, these functions enable the program to decide whether the player has won, lost, or can continue the game.
 
-### 7. Towards the main game loop
+### vii. Towards the main game loop
 
 The main gameplay logic revolves around initializing the game environment, entering the main gameplay loop, and properly cleaning up resources after the game ends. Here's a detailed breakdown:
 
@@ -1175,7 +1176,7 @@ freeGrid(grid, map_size);
 
 ---
 
-### 8. getUserInput
+### viii. getUserInput
 
 The `getUserInput` function is responsible for capturing the player's movement input in real-time without requiring the user to press "Enter" after entering their choice. Here's a step-by-step breakdown:
 
@@ -1250,7 +1251,7 @@ char getUserInput()
 
 ---
 
-### 9. RETURN 0
+### ix. RETURN 0
 
 In C, the `return 0;` statement in a function, typically in the `main` function, serves a specific purpose related to the program's execution status. Let me break it down:
 
@@ -1282,8 +1283,8 @@ The value returned by the `main` function serves as an **exit status** for the p
   - Usually indicate an **error or abnormal termination**.
   - Programmers use specific non-zero values to signal different types of errors. For example:
     ```c
-    return 1; // General error
-    return 2; // Specific error
+    return 1; /* General error */
+    return 2; /* Specific error */
     ```
 
 ---
@@ -1312,17 +1313,183 @@ The value returned by the `main` function serves as an **exit status** for the p
   ```c
   int main() {
       printf("Hello, World!\n");
-      // No return statement
+      /* No return statement */
   }
   ```
   This is equivalent to:
   ```c
   int main() {
       printf("Hello, World!\n");
-      return 0; // Implicitly added by the compiler
+      return 0; /* Implicitly added by the compiler */
   }
   ```
 
 - However, it is still recommended to explicitly write `return 0;` for clarity and maintainability, especially in older C standards (`C89`/`C90`) where omitting it might result in undefined behavior.
 
 ---
+
+## 5. <span style="color: red;">Make it.</span> <span style="color: blue;">Run it.</span> <span style="color: green;">Done.</span>
+
+
+To execute C code, we must first compile it. This is because C is a high-level language that needs to be translated into machine code for execution. This compilation process involves several steps:
+
+1. **Preprocessing**:  
+   The preprocessor handles directives like `#include` and `#define`. It prepares the source code by inserting header files and replacing macros.
+
+2. **Compilation**:  
+   The compiler converts the preprocessed code into assembly language.
+
+3. **Assembly**:  
+   The assembler translates the assembly code into object files (`.o`). These files contain machine code but are not yet complete for execution.
+
+4. **Linking**:  
+   The linker combines all object files, resolves references, and creates an executable file.
+
+For this project, we’ll use the **GNU Compiler Collection (GCC)**, which handles all these steps, including linking.
+
+---
+
+### Compiling with GCC
+We use GCC to compile our code. Since we have multiple `.c` files (some provided as external libraries and others written by us), we need to:
+
+1. **Compile each `.c` file into `.o` object files**:  
+   This is done using the `-c` flag with GCC. For example:  
+   ```bash
+   gcc -c -Wall -Werror -ansi -pedantic src/main.c -o build/main.o
+   ```
+   - **`-Wall`**: Enables all warning messages.  
+   - **`-Werror`**: Treats all warnings as errors.  
+   - **`-ansi`**: Enforces ANSI C compliance (C89 standard).  
+   - **`-pedantic`**: Ensures strict adherence to the C standard.  
+
+   These flags ensure our code meets the assignment requirements.  
+   
+2. **Link all `.o` files into a final executable**:  
+   After generating all `.o` files, we link them into a single executable (e.g., `escape`).
+
+---
+
+### Using `make` and `Makefile`
+Compiling and linking files manually can be tedious. To streamline the process, we use `make` with a `Makefile`. This automates building the executable by defining rules and dependencies.
+
+Before diving into the Makefile, it’s essential to understand **`.d` files**:
+- **Dependency Files (`.d`)**:  
+   These files help `make` track which source files have changed and only recompile those. They are created using GCC with the `-MMD` flag and ensure efficient builds.
+
+---
+
+### Makefile Explanation
+
+Here’s the Makefile for our project:
+
+```makefile
+# Compiler and flags
+CC = gcc
+COMMON_CFLAGS = -Wall -Werror -ansi -pedantic
+CFLAGS = $(COMMON_CFLAGS)
+LDFLAGS = 
+
+# Conditional compilation for BORDERLESS
+ifeq ($(BORDERLESS), 1)
+	CFLAGS += -DBORDERLESS
+endif
+```
+- **`CC`**: Specifies the compiler (GCC in this case).  
+- **`CFLAGS`**: Flags for compilation. `-DBORDERLESS` is added if `BORDERLESS` is set to `1`.  
+
+```makefile
+# Directories
+SRCDIR = src
+INCDIR = include
+LIBDIR = lib
+BINDIR = bin
+OBJDIR = build
+TESTDIR = tests
+```
+Defines directory paths for source files, includes, libraries, binaries, and object files.
+
+```makefile
+# File extensions and patterns
+SRC = $(wildcard $(SRCDIR)/*.c)
+LIB_SRC = $(wildcard $(LIBDIR)/*.c)
+TEST_SRC = $(wildcard $(TESTDIR)/*.c)
+OBJ = $(SRC:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
+LIB_OBJ = $(LIB_SRC:$(LIBDIR)/%.c=$(OBJDIR)/%.o)
+TEST_OBJ = $(TEST_SRC:$(TESTDIR)/%.c=$(OBJDIR)/%.o)
+
+# Dependency files
+DEP = $(OBJ:.o=.d) $(LIB_OBJ:.o=.d) $(TEST_OBJ:.o=.d)
+```
+- **`$(wildcard)`**: Lists all `.c` files in the specified directory.  
+- **`OBJ`**: Maps source files to their corresponding object files.  
+- **`DEP`**: Maps object files to their dependency files.
+
+```makefile
+# Executable name
+EXE = $(BINDIR)/escape
+
+# Build target
+all: $(EXE)
+```
+- **`all`**: The default target to build the executable `escape`.
+
+```makefile
+# Link the final binary
+$(EXE): $(OBJ) $(LIB_OBJ) | $(BINDIR)
+	$(CC) $(CFLAGS) -o $@ $(OBJ) $(LIB_OBJ) $(LDFLAGS)
+```
+Links object files into the final executable.
+
+```makefile
+# Compile source files into the obj directory
+$(OBJDIR)/%.o: $(SRCDIR)/%.c | $(OBJDIR)
+	$(CC) $(CFLAGS) -I$(INCDIR) -I$(LIBDIR) -MMD -MF $(@:.o=.d) -c $< -o $@
+```
+Compiles `.c` files to `.o` files.  
+- **`-I`**: Specifies include directories.  
+- **`-MMD -MF`**: Generates `.d` files for dependencies.  
+
+```makefile
+# Ensure directories exist
+$(BINDIR) $(OBJDIR):
+	mkdir -p $@
+```
+Creates required directories if they don’t exist.
+
+```makefile
+# Clean target
+clean:
+	rm -rf $(OBJDIR) $(BINDIR) $(DEP)
+```
+Removes generated files and directories to reset the project state.
+
+```makefile
+# Include dependency files
+-include $(DEP)
+
+# Phony targets
+.PHONY: all clean test
+```
+- **`-include $(DEP)`**: Includes dependency files if they exist.  
+- **`.PHONY`**: Marks non-file targets like `all` and `clean` to avoid conflicts.
+
+---
+
+### Building and Running
+To build and run the program:
+1. **Build**:  
+   - Run `make` or `make all` to compile and link the program into `bin/escape`.
+   - To build with borderless mode use `make BORDERLESS=1`
+
+2. **Clean**:  
+   Run `make clean` to remove all generated files.
+
+3. **Run**:  
+   Use the following command to execute the program:  
+   ```bash
+   ./bin/escape <row_map> <col_map> <row_player> <col_player> <row_goal> <col_goal>
+   ```
+
+   Here, the parameters specify the map size and initial positions.
+
+--- 
