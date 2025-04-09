@@ -6,7 +6,7 @@
 #include <string.h>
 #include "random.h"
 
-char **initGrid(unsigned short map_size[2], unsigned short player_pos[2], unsigned short goal_pos[2]);
+char **initGrid(unsigned short map_size[2], unsigned short player_pos[2], unsigned short goal_pos[2], unsigned char * error_p);
 void printGrid(char **grid, unsigned short map_size[2]);
 void movePlayer(char user_input, char **grid, unsigned short map_size[2], unsigned short player_pos[2]);
 void freeGrid(char **grid, unsigned short map_size[2]);
