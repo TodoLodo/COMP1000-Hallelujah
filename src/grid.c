@@ -13,10 +13,12 @@
 #include "grid.h"
 
 /* Initializes a 2D grid with specified dimensions and places player and goal at given positions */
-char **initGrid(unsigned short map_size[2], unsigned short player_pos[2], unsigned short goal_pos[2])
+char **initGrid(unsigned short map_size[2], unsigned short player_pos[2], unsigned short goal_pos[2], unsigned char * error_p)
 {
 	unsigned short row;
 	char **grid = (char **)malloc(sizeof(char *) * map_size[0]); /* Allocate rows for grid */
+
+	*error_p = 0;
 
 	if (grid != NULL)
 	{
@@ -48,12 +50,14 @@ char **initGrid(unsigned short map_size[2], unsigned short player_pos[2], unsign
 				grid = NULL;
 				printf("Error: Failure in allocating memory for grid row! row=%u\n", row);
 				row = map_size[0] - 1;
+				*error_p = 1;
 			}
 		}
 	}
 	else
 	{
 		printf("Error: Failure in allocating memory for grid!\n");
+		*error_p = 1;
 	}
 
 	return grid;

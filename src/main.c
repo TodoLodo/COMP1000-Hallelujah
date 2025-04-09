@@ -17,15 +17,16 @@ int main(int argc, char **argv)
 {
 	unsigned short map_size[2], player_pos[2], goal_pos[2]; /* Map dimensions and player/goal positions */
 	char **grid = NULL;										/* Grid representation */
+	unsigned char grid_error;
 
 	/* Parse and validate arguments, initialize map and player positions */
 	if (argParser(argc, argv, map_size, player_pos, goal_pos))
 	{
 		/* Initialize grid and random number generator */
-		grid = initGrid(map_size, player_pos, goal_pos);
+		grid = initGrid(map_size, player_pos, goal_pos, &grid_error);
 		initRandom();
 
-		if (grid != NULL)
+		if (grid_error != 1)
 		{
 			/* Display the current grid */
 			printGrid(grid, map_size);
@@ -46,5 +47,5 @@ int main(int argc, char **argv)
 		}
 	}
 
-	return 0;
+	return grid_error;
 }
