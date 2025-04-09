@@ -4,9 +4,9 @@ COMMON_CFLAGS = -Wall -Werror -ansi -pedantic
 CFLAGS = $(COMMON_CFLAGS)
 LDFLAGS = 
 
-# Conditional compilation for BORDERLESS
-ifeq ($(BORDERLESS), 1)
-	CFLAGS += -DBORDERLESS
+# Conditional compilation for PULL
+ifeq ($(PULL), 1)
+	CFLAGS += -DPULL
 endif
 
 # Directories
@@ -29,7 +29,7 @@ TEST_OBJ = $(TEST_SRC:$(TESTDIR)/%.c=$(OBJDIR)/%.o)
 DEP = $(OBJ:.o=.d) $(LIB_OBJ:.o=.d) $(TEST_OBJ:.o=.d)
 
 # Executable name
-EXE = $(BINDIR)/ysa
+EXE = $(BINDIR)/box
 
 # Build target
 all: $(EXE)
