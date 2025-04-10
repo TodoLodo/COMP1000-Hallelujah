@@ -25,7 +25,7 @@ char **initGrid(unsigned short map_size[2], unsigned short player_pos[2], unsign
 		/* Loop through rows, allocate columns, initialize empty spaces */
 		for (row = 0; row < map_size[0]; row++)
 		{
-			grid[row] = (char *)malloc(sizeof(char) * map_size[1]); /* Allocate memory for columns */
+			grid[row] = (char *)malloc(sizeof(char) * (map_size[1] + 1)); /* Allocate memory for columns */
 
 			if (grid[row] != NULL)
 			{
@@ -42,6 +42,8 @@ char **initGrid(unsigned short map_size[2], unsigned short player_pos[2], unsign
 				{
 					grid[goal_pos[0]][goal_pos[1]] = 'G';
 				}
+
+				grid[row][map_size[1]] = '\0';
 			}
 			else
 			{
@@ -67,7 +69,8 @@ char **initGrid(unsigned short map_size[2], unsigned short player_pos[2], unsign
 void printGrid(char **grid, unsigned short map_size[2])
 {
 	unsigned short i;
-	char *h_border = malloc(sizeof(char) * (map_size[1] + 2));
+	char *h_border = malloc(sizeof(char) * (map_size[1] + 3));
+	h_border[map_size[1] + 2] = '\0';
 	memset(h_border, '*', map_size[1] + 2);
 
 	system("clear");
