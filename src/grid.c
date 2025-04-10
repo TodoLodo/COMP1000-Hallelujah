@@ -11,12 +11,12 @@
 */
 
 #include "grid.h"
+#include "color.h"
 
 /* Initializes a 2D grid with specified dimensions and places player and goal at given positions */
-char **initGrid(unsigned short map_size[2], unsigned short player_pos[2], unsigned short goal_pos[2])
+char **initGrid(unsigned short map_size[2], unsigned short player_pos[2], unsigned short goal_pos[2], unsigned short box_pos[2])
 {
 	unsigned short row;
-	unsigned short box_pos[2];
 	char **grid = (char **)malloc(sizeof(char *) * map_size[0]); /* Allocate rows for grid */
 
 	if (grid != NULL)
@@ -61,9 +61,9 @@ char **initGrid(unsigned short map_size[2], unsigned short player_pos[2], unsign
 }
 
 /* Prints the current grid state with borders */
-void printGrid(char **grid, unsigned short map_size[2])
+void printGrid(char **grid, unsigned short map_size[2], unsigned short goal_pos[2], unsigned short box_pos[2])
 {
-	unsigned short i;
+	unsigned short i, j;
 	char *h_border = malloc(sizeof(char) * (map_size[1] + 2));
 	memset(h_border, '*', map_size[1] + 2);
 
@@ -72,7 +72,31 @@ void printGrid(char **grid, unsigned short map_size[2])
 	printf("%s\n", h_border);
 	for (i = 0; i < map_size[0]; i++)
 	{
-		printf("*%s*\n", grid[i]);
+		if (goal_pos[0] == i)
+		{
+			for (j = 0; j < map_size[1]; j++)
+			{
+				if (goal_pos[1] == j)
+				{
+					if (memcmp(goal_pos, box_pos, 2) == 0)
+					{
+						setBackground("green");
+					}
+					else
+					{
+						setBackground("red");
+					}
+					printf('\c', grid[i][j]);
+					setBackground("reset");
+				}
+				
+			}
+			
+		}
+		else
+		{
+			printf("*%s*\n", grid[i]);
+		}
 	}
 	printf("%s\n", h_border);
 
@@ -102,7 +126,7 @@ void _pull(int pos[2], unsigned short map_size[2])
 }
 
 /* Moves the player based on user input and checks border conditions */
-void movePlayer(char user_input, char **grid, unsigned short map_size[2], unsigned short player_pos[2])
+void movePlayer(char user_input, char **grid, unsigned short map_size[2], unsigned short player_pos[2], unsigned short box_pos[2])
 {
 	int future_pos[2];
 
@@ -137,13 +161,12 @@ void movePlayer(char user_input, char **grid, unsigned short map_size[2], unsign
 #endif
 
 	/* Move player to future position if accessible */
-	if (!(future_pos[0] == (int)player_pos[0] && future_pos[1] == (int)player_pos[1]) && future_pos[0] >= 0 && future_pos[0] < map_size[0] && future_pos[1] >= 0 && future_pos[1] < map_size[1] && grid[future_pos[0]][future_pos[1]] != 'X')
+	if (!(future_pos[0] == (int)player_pos[0] && future_pos[1] == (int)player_pos[1]) && future_pos[0] >= 0 && future_pos[0] < map_size[0] && future_pos[1] >= 0 && future_pos[1] < map_size[1] && grid[future_pos[0]][future_pos[1]] != 'X' || (memcmp(future_pos, box_pos, 2) == 0 ))
 	{
 		grid[player_pos[0]][player_pos[1]] = ' ';
 		player_pos[0] = (unsigned short)future_pos[0];
 		player_pos[1] = (unsigned short)future_pos[1];
 		grid[player_pos[0]][player_pos[1]] = 'P';
-
 	}
 }
 
