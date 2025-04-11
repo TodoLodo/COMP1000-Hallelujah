@@ -33,9 +33,8 @@ int main(int argc, char **argv)
 			/* Main gameplay loop */
 			while (!winOrLose(grid, map_size, box_pos, goal_pos))
 			{
-
-				/* Move player and check game status */
-				movePlayer(getUserInput(), grid, map_size, player_pos, goal_pos, box_pos);
+				/* Move player and box */
+				move(getUserInput(), grid, map_size, player_pos, goal_pos, box_pos);
 
 				/* Display the current grid */
 				printGrid(grid, map_size, goal_pos, box_pos);

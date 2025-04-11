@@ -5,14 +5,15 @@
 	*******
 
 	Filename: grid.c
-	Description: Defines the grid and player movement functionality, including initialization,
-				 player movement, printing, and pathfinding using DFS.
+	Description: Defines the grid, player and box movement functionality, including initialization,
+				 player and box movement, printing, and win or lose conditions.
 	Author: Todo Lodo
 */
 
 #include "grid.h"
 #include "color.h"
 
+/* Initializes box position with random choice avoiding goal and player positions whilst staying in boundaries */
 void _initBox(unsigned short map_size[2], unsigned short player_pos[2], unsigned short goal_pos[2], unsigned short box_pos[2])
 {
 	memcpy(box_pos, player_pos, sizeof(short) * 2);
@@ -130,8 +131,8 @@ void printGrid(char **grid, unsigned short map_size[2], unsigned short goal_pos[
 	free(h_border);
 }
 
-/* Moves the player based on user input and checks border conditions */
-void movePlayer(char user_input, char **grid, unsigned short map_size[2], unsigned short player_pos[2], unsigned short goal_pos[2], unsigned short box_pos[2])
+/* Moves the player and box based on user input and checks border conditions */
+void move(char user_input, char **grid, unsigned short map_size[2], unsigned short player_pos[2], unsigned short goal_pos[2], unsigned short box_pos[2])
 {
 	int future_player_pos[2], future_box_pos[2];
 
@@ -164,7 +165,7 @@ void movePlayer(char user_input, char **grid, unsigned short map_size[2], unsign
 	/* Move player to future position if accessible */
 	if (!(future_player_pos[0] == (int)player_pos[0] && future_player_pos[1] == (int)player_pos[1]) && future_player_pos[0] >= 0 && future_player_pos[0] < map_size[0] && future_player_pos[1] >= 0 && future_player_pos[1] < map_size[1])
 	{
-
+		grid[player_pos[0]][player_pos[1]] = ' ';
 		if (future_player_pos[0] == box_pos[0] && future_player_pos[1] == box_pos[1])
 		{
 			future_box_pos[0] = (int)box_pos[0] + (future_player_pos[0] - (int)player_pos[0]);
@@ -172,7 +173,6 @@ void movePlayer(char user_input, char **grid, unsigned short map_size[2], unsign
 
 			if (future_box_pos[0] >= 0 && future_box_pos[0] < map_size[0] && future_box_pos[1] >= 0 && future_box_pos[1] < map_size[1])
 			{
-				grid[player_pos[0]][player_pos[1]] = ' ';
 				player_pos[0] = (unsigned short)future_player_pos[0];
 				player_pos[1] = (unsigned short)future_player_pos[1];
 
@@ -191,8 +191,6 @@ void movePlayer(char user_input, char **grid, unsigned short map_size[2], unsign
 			}
 
 #endif
-			grid[player_pos[0]][player_pos[1]] = ' ';
-
 			player_pos[0] = (unsigned short)future_player_pos[0];
 			player_pos[1] = (unsigned short)future_player_pos[1];
 		}
@@ -219,15 +217,14 @@ void freeGrid(char **grid, unsigned short map_size[2])
 	}
 }
 
-/* Determines win/lose status by checking if player can reach goal */
+/* Determines win/lose status by checking if Box can reach goal */
 unsigned char winOrLose(char **grid, unsigned short map_size[2], unsigned short box_pos[2], unsigned short goal_pos[2])
 {
 	unsigned char return_val = 0;
 
-	/* Check if player is at goal position */
+	/* Check if Box is at goal position */
 	if (memcmp(box_pos, goal_pos, sizeof(unsigned short) * 2) == 0)
 	{
-
 		printf("You Win!\n");
 		return_val = 1;
 	}
@@ -236,7 +233,7 @@ unsigned char winOrLose(char **grid, unsigned short map_size[2], unsigned short 
 	if ((box_pos[0] == 0 || box_pos[0] == map_size[0] - 1) || (box_pos[1] == 0 || box_pos[1] == map_size[1] - 1))
 	{
 		printf("You Lose!\n");
-		return_val = 1; /* Player cannot reach goal */
+		return_val = 1; /* Box cannot reach goal */
 	}
 #endif
 
