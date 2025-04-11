@@ -13,18 +13,32 @@
 #include "grid.h"
 #include "color.h"
 
+void _initBox(unsigned short map_size[2], unsigned short player_pos[2], unsigned short goal_pos[2], unsigned short box_pos[2])
+{
+	memcpy(box_pos, player_pos, sizeof(short) * 2);
+
+	/* Find a random empty spot and place an 'X' */
+	while (memcmp(player_pos, box_pos, sizeof(short) * 2) == 0 || memcmp(goal_pos, box_pos, sizeof(short) * 2) == 0)
+	{
+		box_pos[0] = randomUCP(1, map_size[0] - 2);
+		box_pos[1] = randomUCP(1, map_size[1] - 2);
+	}
+}
+
 /* Initializes a 2D grid with specified dimensions and places player and goal at given positions */
 char **initGrid(unsigned short map_size[2], unsigned short player_pos[2], unsigned short goal_pos[2], unsigned short box_pos[2])
 {
 	unsigned short row;
 	char **grid = (char **)malloc(sizeof(char *) * map_size[0]); /* Allocate rows for grid */
 
+	_initBox(map_size, player_pos, goal_pos, box_pos);
+
 	if (grid != NULL)
 	{
 		/* Loop through rows, allocate columns, initialize empty spaces */
 		for (row = 0; row < map_size[0]; row++)
 		{
-			grid[row] = (char *)malloc(sizeof(char) * map_size[1]); /* Allocate memory for columns */
+			grid[row] = (char *)malloc(sizeof(char) * (map_size[1] + 1)); /* Allocate memory for columns */
 
 			if (grid[row] != NULL)
 			{
@@ -41,6 +55,14 @@ char **initGrid(unsigned short map_size[2], unsigned short player_pos[2], unsign
 				{
 					grid[goal_pos[0]][goal_pos[1]] = 'G';
 				}
+
+				/* Place box at specified position */
+				if (row == box_pos[0])
+				{
+					grid[box_pos[0]][box_pos[1]] = 'B';
+				}
+
+				grid[row][map_size[1]] = '\0';
 			}
 			else
 			{
@@ -64,7 +86,8 @@ char **initGrid(unsigned short map_size[2], unsigned short player_pos[2], unsign
 void printGrid(char **grid, unsigned short map_size[2], unsigned short goal_pos[2], unsigned short box_pos[2])
 {
 	unsigned short i, j;
-	char *h_border = malloc(sizeof(char) * (map_size[1] + 2));
+	char *h_border = malloc(sizeof(char) * (map_size[1] + 3));
+	h_border[map_size[1] + 2] = '\0';
 	memset(h_border, '*', map_size[1] + 2);
 
 	system("clear");
@@ -74,11 +97,12 @@ void printGrid(char **grid, unsigned short map_size[2], unsigned short goal_pos[
 	{
 		if (goal_pos[0] == i)
 		{
+			printf("*");
 			for (j = 0; j < map_size[1]; j++)
 			{
 				if (goal_pos[1] == j)
 				{
-					if (memcmp(goal_pos, box_pos, 2) == 0)
+					if (memcmp(goal_pos, box_pos, sizeof(short) * 2) == 0)
 					{
 						setBackground("green");
 					}
@@ -86,12 +110,15 @@ void printGrid(char **grid, unsigned short map_size[2], unsigned short goal_pos[
 					{
 						setBackground("red");
 					}
-					printf('\c', grid[i][j]);
+					printf("%c", grid[i][j]);
 					setBackground("reset");
 				}
-				
+				else
+				{
+					printf("%c", grid[i][j]);
+				}
 			}
-			
+			printf("*\n");
 		}
 		else
 		{
@@ -103,71 +130,76 @@ void printGrid(char **grid, unsigned short map_size[2], unsigned short goal_pos[
 	free(h_border);
 }
 
-/* Adjusts the position to wrap around borders if PULL is defined */
-void _pull(int pos[2], unsigned short map_size[2])
-{
-	if (pos[0] < 0)
-	{
-		pos[0] = map_size[0] - 1;
-	}
-	else if (pos[0] >= map_size[0])
-	{
-		pos[0] = 0;
-	}
-
-	if (pos[1] < 0)
-	{
-		pos[1] = map_size[1] - 1;
-	}
-	else if (pos[1] >= map_size[1])
-	{
-		pos[1] = 0;
-	}
-}
-
 /* Moves the player based on user input and checks border conditions */
-void movePlayer(char user_input, char **grid, unsigned short map_size[2], unsigned short player_pos[2], unsigned short box_pos[2])
+void movePlayer(char user_input, char **grid, unsigned short map_size[2], unsigned short player_pos[2], unsigned short goal_pos[2], unsigned short box_pos[2])
 {
-	int future_pos[2];
+	int future_player_pos[2], future_box_pos[2];
 
-	future_pos[0] = (int)player_pos[0];
-	future_pos[1] = (int)player_pos[1];
+	future_player_pos[0] = (int)player_pos[0];
+	future_player_pos[1] = (int)player_pos[1];
 
 	/* Update future position based on input */
 	switch (user_input)
 	{
 	case 'w':
-		future_pos[0]--;
+		future_player_pos[0]--;
 		break;
 
 	case 's':
-		future_pos[0]++;
+		future_player_pos[0]++;
 		break;
 
 	case 'a':
-		future_pos[1]--;
+		future_player_pos[1]--;
 		break;
 
 	case 'd':
-		future_pos[1]++;
+		future_player_pos[1]++;
 		break;
 
 	default:
 		break;
 	}
 
-#ifdef PULL
-	_pull(future_pos, map_size);
-#endif
-
 	/* Move player to future position if accessible */
-	if (!(future_pos[0] == (int)player_pos[0] && future_pos[1] == (int)player_pos[1]) && future_pos[0] >= 0 && future_pos[0] < map_size[0] && future_pos[1] >= 0 && future_pos[1] < map_size[1] && grid[future_pos[0]][future_pos[1]] != 'X' || (memcmp(future_pos, box_pos, 2) == 0 ))
+	if (!(future_player_pos[0] == (int)player_pos[0] && future_player_pos[1] == (int)player_pos[1]) && future_player_pos[0] >= 0 && future_player_pos[0] < map_size[0] && future_player_pos[1] >= 0 && future_player_pos[1] < map_size[1])
 	{
-		grid[player_pos[0]][player_pos[1]] = ' ';
-		player_pos[0] = (unsigned short)future_pos[0];
-		player_pos[1] = (unsigned short)future_pos[1];
-		grid[player_pos[0]][player_pos[1]] = 'P';
+
+		if (future_player_pos[0] == box_pos[0] && future_player_pos[1] == box_pos[1])
+		{
+			future_box_pos[0] = (int)box_pos[0] + (future_player_pos[0] - (int)player_pos[0]);
+			future_box_pos[1] = (int)box_pos[1] + (future_player_pos[1] - (int)player_pos[1]);
+
+			if (future_box_pos[0] >= 0 && future_box_pos[0] < map_size[0] && future_box_pos[1] >= 0 && future_box_pos[1] < map_size[1])
+			{
+				grid[player_pos[0]][player_pos[1]] = ' ';
+				player_pos[0] = (unsigned short)future_player_pos[0];
+				player_pos[1] = (unsigned short)future_player_pos[1];
+
+				box_pos[0] = (unsigned short)future_box_pos[0];
+				box_pos[1] = (unsigned short)future_box_pos[1];
+			}
+		}
+		else
+		{
+#ifdef PULL
+			if ((2 * (int)player_pos[0] - future_player_pos[0]) == box_pos[0] && (2 * (int)player_pos[1] - future_player_pos[1]) == box_pos[1])
+			{
+				grid[box_pos[0]][box_pos[1]] = ' ';
+				box_pos[0] = player_pos[0];
+				box_pos[1] = player_pos[1];
+			}
+
+#endif
+			grid[player_pos[0]][player_pos[1]] = ' ';
+
+			player_pos[0] = (unsigned short)future_player_pos[0];
+			player_pos[1] = (unsigned short)future_player_pos[1];
+		}
 	}
+	grid[goal_pos[0]][goal_pos[1]] = 'G';
+	grid[box_pos[0]][box_pos[1]] = 'B';
+	grid[player_pos[0]][player_pos[1]] = 'P';
 }
 
 /* Frees the allocated grid memory */
@@ -187,107 +219,26 @@ void freeGrid(char **grid, unsigned short map_size[2])
 	}
 }
 
-/* Validates the position on grid as accessible and unvisited */
-unsigned char _isValid(int pos[2], unsigned char **visited, char **grid, unsigned short map_size[2])
-{
-	return pos[0] >= 0 && pos[0] < map_size[0] && pos[1] >= 0 && pos[1] < map_size[1] && grid[pos[0]][pos[1]] != 'X' && !visited[pos[0]][pos[1]];
-}
-
-/* Recursive DFS algorithm to find path to goal */
-unsigned char _dfs(int pos[2], unsigned char **visited, char **grid, unsigned short map_size[2])
-{
-	unsigned char found_path = 0;
-	int newPos[2];
-
-#ifdef PULL
-	_pull(pos, map_size);
-#endif
-
-	/* Validate position */
-	if (_isValid(pos, visited, grid, map_size))
-	{
-		/* Check if goal is reached */
-		if (grid[pos[0]][pos[1]] == 'G')
-		{
-			found_path = 1;
-		}
-		else
-		{
-			visited[pos[0]][pos[1]] = 1; /* Mark cell as visited */
-
-			/* Explore all 4 directions */
-			/* Up */
-			newPos[0] = pos[0] - 1;
-			newPos[1] = pos[1];
-			found_path = _dfs(newPos, visited, grid, map_size);
-
-			/* Down */
-			if (!found_path)
-			{
-				newPos[0] = pos[0] + 1;
-				newPos[1] = pos[1];
-				found_path = _dfs(newPos, visited, grid, map_size);
-			}
-
-			/* Left */
-			if (!found_path)
-			{
-				newPos[0] = pos[0];
-				newPos[1] = pos[1] - 1;
-				found_path = _dfs(newPos, visited, grid, map_size);
-			}
-
-			/* Right */
-			if (!found_path)
-			{
-				newPos[0] = pos[0];
-				newPos[1] = pos[1] + 1;
-				found_path = _dfs(newPos, visited, grid, map_size);
-			}
-		}
-	}
-
-	return found_path;
-}
-
 /* Determines win/lose status by checking if player can reach goal */
-unsigned char winOrLose(char **grid, unsigned short map_size[2], unsigned short player_pos[2], unsigned short goal_pos[2])
+unsigned char winOrLose(char **grid, unsigned short map_size[2], unsigned short box_pos[2], unsigned short goal_pos[2])
 {
-	unsigned char return_val = 0, **visited = NULL;
-	unsigned short i;
-	int int_pos[2];
-
-	int_pos[0] = (int)player_pos[0];
-	int_pos[1] = (int)player_pos[1];
-
-	visited = (unsigned char **)malloc(sizeof(unsigned char *) * map_size[0]);
-
-	for (i = 0; i < map_size[0]; i++)
-	{
-
-		visited[i] = (unsigned char *)malloc(map_size[1]);
-		memset(visited[i], 0, map_size[1]);
-	}
+	unsigned char return_val = 0;
 
 	/* Check if player is at goal position */
-	if (memcmp(player_pos, goal_pos, sizeof(unsigned short) * 2) == 0)
+	if (memcmp(box_pos, goal_pos, sizeof(unsigned short) * 2) == 0)
 	{
 
 		printf("You Win!\n");
 		return_val = 1;
 	}
-	else if (!_dfs(int_pos, visited, grid, map_size))
+
+#ifndef PULL
+	if ((box_pos[0] == 0 || box_pos[0] == map_size[0] - 1) || (box_pos[1] == 0 || box_pos[1] == map_size[1] - 1))
 	{
 		printf("You Lose!\n");
 		return_val = 1; /* Player cannot reach goal */
 	}
-
-	/* Free memory */
-	for (i = 0; i < map_size[0]; i++)
-	{
-		free(visited[i]);
-	}
-	free(visited);
+#endif
 
 	return return_val;
 }
