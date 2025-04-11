@@ -1,4 +1,4 @@
-# Assignment Explanation
+# Assignment Specification
 
 ## Objectives:
 
