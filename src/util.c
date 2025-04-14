@@ -145,7 +145,7 @@ char getUserInput()
 	char input;
 
 	/* Prompt the user for movement input */
-	printf("Press w to go up\nPress s to go down\nPress a to go left\nPress d to go right\n");
+	printf("Move the box to the goal to win the game!\nPress w to go up\nPress s to go down\nPress a to go left\nPress d to go right\n");
 
 	/* Temporarily disable input buffering to read single character input */
 	disableBuffer();
